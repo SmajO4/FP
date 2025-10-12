@@ -1,0 +1,289 @@
+###############################################
+
+|-> PATTERN (uzorak) <-|
+
+  Moguci oblik vrijednosti.
+
+  Moze egzistirati samo u procesu pattern matchinga.
+
+===============================================
+
+|-> PATTERN MATCHING (podudaranje uzoraka) <-|
+
+  Trebaju nam dvije stvari: vrijednost i uzorak.
+
+  Pitanje da li se uzorak podudara sa vrijednosti.
+
+  Moze uspjeti ili ne.
+
+  Radi i uvijek uspjeva u 4 situacije:
+  * let    * match    *lambda   *iznimke
+
+
+===============================================
+
+|-> BINDING (vezivanje) <-|
+
+  Proces povezivanja simbola i vrijednosti.
+
+  Dogadja se ako pattern matching uspije.
+
+  Simbol - varijabla, ime za neku vrijednost.
+  Defakto imena koja se vezu za vrijednost, u cijelosti ili parcijalno.
+
+            SIMBOL <---> VRIJEDNOST
+                     |        
+               Pattern matching
+
+  Simbol se specificira unutar uzorka.
+
+===============================================
+
+|-> Razlike izmedju vrijednosti varijabli u FP i IP <-|
+
+  1. Dodijeljivanje vrijednosti ne uspijeva uvijek.
+  2. Vezivanje moze proci bez vezivanja ijednog simbola
+  3. Vezivanjem se pravi novo ime za postojecu vrijednost.
+  4. Ponovno vezivanje za isto ime nije moguce. 
+
+###############################################
+
+|-> let izraz <-|
+
+  Izraz u kojem nastaju simboli - varijable.
+
+  Sintaksa:
+    _________________________
+    let pat1 = expr1 in expr2
+
+    V
+
+    let pat1 = epxr1
+    expr2
+    _________________________
+
+  let je izraz i vraca vrijednost rezultata izvrsenja expr2, nekog tipa.
+
+  KAKO?
+
+    Izvrsi se expr1, i dobijena vrijednost se podvrgava procesu podudaranja
+    uzoraka sa pat1.
+
+    Izvrsi se expr2, koji vraca rezultat let izraza.
+
+    Bitan detalj: bilo kakvo koristeno ime (simbol) u uzorku se moze koristiti 
+    u expr2 gdje ce se umjesto imena koristiti pripadna vrijednost.
+
+  Uzorak ne mora imati simbol.
+  Simbol iz uzorka se cak i ne mora vezati ni za sta.
+
+-----------------------------------------------
+
+  U nastavku cemo vidjeti kako se uzorci kreiraju.
+
+  Ucimo sve ove bazne uzorke, jer ih u buducnosti zelimo komponovati u kompleksije.
+
+  Posto su ovo uzorci, u let izrazu se stavljaju na mjesto pat1.
+
+###############################################
+
+|-> IDENTIFIER PATTERN <-|
+
+  Format:
+    ime    // nekakvo ime, x, foo, bar,..
+
+  let:
+    let ime = expr1 in expr2
+
+
+  ime je defakto simbol
+
+  Ovo je nacin kako cu cu kreirati varijable u F#.
+
+  Podudaranje sa ovim uzorkom uvijek uspjeva.
+  Vezivanje ovog uzorka i date vrijednosti (bilo kog tipa) uvijek uspjeva.
+
+-----------------------------------------------
+  DETALJ:
+  Isti simbol, mozemo bindati na vise mjesta unutar jednog izraza, pod uslovom
+  da su u separatnim let izrazima.
+
+  Ovu cinjenicu poistovjecujemo sa varijablama unutar i van scope-a kod IP.
+
+===============================================
+
+|-> WILDCARD PATTERN <-|
+  
+  Format:
+    _ 
+
+  let:
+    let _ = expr1 in expr2
+   
+
+  _ je defakto simbol
+
+  Podudaranje sa ovim uzorkom uvijek uspjeva.
+  Vezivanje ovog uzorka i date vrijednosti (bilo kog tipa) se nece desiti.
+
+  Defakto posto nema vezivanja, _ ne moze egzistirati u expr2, kao sto je 
+  to mogao identifier pattern.
+
+===============================================
+
+|-> CONSTANT PATTERN <-|
+
+  Format:
+    literal
+
+  let:
+    let literal = expr1 in expr2
+
+
+  literal - vrijednost bilo kog tipa, konstantni uzorak.
+
+  Podudaranje uspijeva samo ako su vrijednost i dati uzorak IDENTICNI i 
+  po vrijednosti i po tipu.
+  
+
+  Efektivno: 
+  Literal == rezultat_expr1    -> matchiranje uspijeva
+
+  Ako podudaranje ne uspije, u F# to rezultira bacanjem iznimke.
+
+===============================================
+
+|-> OR PATTERN <-|
+
+  Komponujemo jednostavne patterne u kompleksniji OR pattern.
+
+  Format:
+    pat0 | pat1 | ... | patn 
+
+  Podudaranje OR uzorka uspijeva, ako barem jedan od individualnih uzoraka 
+  koji ucestvuju se podudare sa vrijednosti.
+  
+  U suprotnom javlja se greska u kompjaliranju.
+
+-----------------------------------------------
+  Detalj:
+  Ako imamo konkretan simbol, moramo ga imati u svim zasebnim uzorcima.
+  Ako imamo konkertnu konstantu, smijemo imati razlicite konstante u drugim uzorcima.
+  Redoslijed poredjenja pojedinih uzoraka sa vrijednosti ide sa lijeva na desno.
+    
+###############################################
+
+|-> lambda izraz <-|
+  
+  Kada se izvrsi, nazad dobijamo vrijednost tipa funkcije.
+
+  Format: 
+    fun pat -> expr
+
+
+  Intuicija:
+    funkcija koja se proizvede je zapravo let,
+    koji nije uradio pattern match.
+
+    lamda je odgodjeni pattern match.
+
+  
+  Defakto, kada se lamda izraz izvrsi nazad dobijemo let koji trazi svoj expr1, 
+  da bi odradio pattern matching.
+
+  
+  Lambda se aplicira na izraz, preciznije na vrijednost.
+
+  Lamda nam vrati funkciju.
+  Funkciju mozemo aplicirati - komponovati sa drugim vrijednostima u procesu aplikacije.
+
+===============================================
+|-> Aplikacija funkcije <-|
+
+  Format:
+
+    fval val
+    v 
+    (fun pat -> expr) val
+
+        fval --- vrijednost tipa funkcije (ono sto nam vrati lamda)
+        val --- vrijednost prezentirana u aplikaciji (za sad bilo koja vrijednost)
+
+  
+  Lamda izraz se izvrsi, vrati se funkcija, koja ucestvuje u novom izrazu
+  koja se zove aplikacija.
+
+  Kada se aplikacija izvrsi, izraz mora vratiti neku vrijednost odredjenog tipa.
+
+  Aplikacija podrazumijeva da vrijednost koja ucestvuje u aplikaciji ce u procesu
+  izvrsavanja aplikacije se pattern matchirati sa uzorkom koji figurira u lambdi.
+
+  Pitanje da li ima vezivanja simbola ovisi od toga, koji je uzorak koristen. ?
+
+      Razmisljajmo da imamo ovakav oblik:
+
+        (fun pat -> expr) value
+
+      Razmisljamo da imamo lambdu koju apliciramo na vrijednost.
+
+-----------------------------------------------
+  Zakljucak:
+  
+  Kada apliciramo lambdu na neku vrijednost, vrsi se pattern match sa patternom koji
+  je u definiciji lambde.
+
+  Nakon toga, se izvrsi izraz koji je u definiciji lambde, i sta god on vrati nazad 
+  to je rezultat cjelokupnog izvrsenja aplikacije.
+
+===============================================
+
+|-> Uslovi da bi pattern match uspio <-|
+
+  Ponovno pogledajmo format:
+
+    (fun pat -> expr) val
+
+  Ovisno od patterna, imamo dvije situacije:
+
+    1. Polimorfna lamda funkcija
+       
+       Uzorak mora biti takav da se uvijek vezuje za vrijednost.
+
+       Dakle, pat se mora moci povezati sa bilo kojom vrijednosti, bilo kog tipa.
+
+       Npr.
+       (fun x -> x) 5  // val moze biti bilo koja vrijednost
+       (fun _ -> 25) 10
+
+    2. Monomorfna lamda funkcija
+
+       Uzorak je takav da je ogranicen po pitanju toga, cime se moze vezati.
+
+       Ogranicena je na samo jedan tip, kojim se moze vezati.
+
+       Npr.
+       (fun () -> x) ()  // kao val, iskljucivo samo moze biti ()
+       (fun 3 -> 5) 3   // iskljucivo mora biti broj koji je identican CP-u.
+
+===============================================
+  
+  Detalj:
+    Neka imamo let, ciji je expr1 lamda izraz.
+
+    ID i WC uzorci, se mogu vezati i za funkciju.
+
+    Razmisljati na nacin, da ako u expr 2, budemo imali dati uzorak koji je se 
+    uspio vezati za funkciju koju je vratio lamda izraz , u tom istom expr2 cemo 
+    doslovno dobiti aplikaciju.
+
+    Npr.
+    let foo = fun x -> x * 3 in 
+      foo 5
+
+    Aplikaciju koju dobijemo je: (x * 3) 5
+  
+===============================================
+  
+  Aplikacija je izraz koji poslije operatora . ima najveci prioritet.
+
+###############################################

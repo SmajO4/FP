@@ -1,0 +1,267 @@
+let izraz kada se izvrsi proizvede vrijednost onog tipa kojeg proizvodi expr2.
+
+Lambda je izraz.
+Kada se izvrsi, ono sto dobijemo nazad je funkcija.
+
+Format:
+fun pat -> expr
+
+Ovdje imamo jedan pattern i jedan izraz.
+
+Intuicija:
+
+Razmisljati o tome da je funkcija koja se proizvede zapravo let koji nije uradio
+pattern match.
+
+Da bi let uradio pattern match, treba mu prvi izraz.
+
+Dakle ovo kad se izvrsi, nazad dobijemo let koji ceka na expr1.
+Efektivno dobijem nekakav objekat koji ceka na pattern match.
+
+lambda je odgodjeni pattern match.
+Imam sve sto samo ceka na pattern match kojem samo jos fali vrijednost ili expr,
+spram kojeg ce raditi pattern match.
+
+
+
+----------------------------------------------
+Funkcije su vrijednosti koje se mogu podvrgavati aplikaciji, izrazu koji podrazumjeva:
+
+- prezentaciju vrijednosti odgovarajućeg tipa funkciji korištenog u izrazu za aplikaciju,
+
+- vrijednost se podudara sa uzorkom pat, korištenim u lambda izrazu kojim je funkcija kreirana,
+
+- aplikacija vraća vrijednost izraza expr, koji je korišten u lamda izrazu kojim je kreirana funkcija
+      - Unutar expr mogu figurirati imena koja su korištena u uzorku pat.
+----------------------------------------------
+
+
+Matematicki brojeve koristimo u kompoziciji.
+
+Ono sto mozemo raditi sa ovim, je komponovanje sa drugim vrijednostima u 
+procesu koji zovemo aplikacija.
+
+Lambdu mozemo aplicirati na neki izraz, ili bolje receno na vrijednost.
+
+
+
+
+Aplikacija funkcije
+Format:
+
+fval val
+fval --- vrijednost tipa funkcije (tip lambde)
+val --- vrijednost prezentirana u aplikaciji (za sad bilo koja vrijednost)
+
+
+Iz lambde dobijem funkciju a funkciju mogu aplicirati, komponovati sa drugim  
+vrijednostima u procesu aplikacije.
+
+
+
+Zasto ovo nije validna aplikacija?
+
+>> 2 3
+
+Prvo mora biti nesto sto je tipa funkcije. 2 je integer.
+Ne mozemo aplicirati broj 2 na broj 3.
+
+
+Zasto ovo jeste validna aplikacija?
+(fun _ -> 100) 2
+
+Zagrade sluze za prioritete.
+U zagradi sam zapisao lambda izraz.
+Nazad dobijemo lamda funkciju, koja se dalje moze aplicirati na 2.
+
+
+
+
+Kako se izvrsava aplikacija?
+Lamda izraz se izvrsi, vrati se funkcija, koja ucestvuje u novom izrazu
+koja se zove aplikacija.
+Kada se aplikacija izvrsi, izraz mora vratiti neku vrijednost odredjenog tipa.
+
+
+Kako se to sve proracuna i koji je tip koji se vraca nazad?
+
+
+
+Unutar definicije lamda funkcije, smo koristili pattern i izraz.
+Ali nismo nista pattern matchirali.
+
+
+
+Metodologija aplikacije podrazumijeva da vrijednost koja ucestvuje u aplikaciji
+(kao sto je ova 2) ce u procesu izvrsavanja aplikacije pattern matchirati se sa 
+uzorkom koji figurira u lambdi.
+
+U lambi u ovom slucaju figurira _. Pattern match uspijeva, jer _ uvijek uspjeva.
+
+Da li ima vezivanja simbola? - Nema.
+
+Ostalo je jos izvrsenje izraza koji je sastavni dio lambde.
+
+
+
+(fun _ -> 100 + 3) 2 
+
+Izvrsi se i nazad dobijem 103.
+
+Rezultat kompletnog leta je sta? 
+Ako smo rekli da je lambda odgodjeni pattern match za let, onda je rezultat aplikacije
+lambde, efektivno, da odradis pattern match.
+
+
+
+KONACNO:
+
+Kada apliciramo lambdu na neku vrijednost, vrsi se pattern match sa patternom koji je u 
+definiciji lambde.
+Nakon toga se izvrsi izraz koji je u definiciji lamde i sta god on vrati nazad to je rezultat
+cjelokupnog izvrsenja aplikacije.
+Aplikacija lambde vraca tip izraza u kojem smo definirali lambu.
+
+
+Pogledajmo sljedeci kod:
+
+(fun _ -> 100 + x) 2
+
+Tokom procesa aplikacije, kada se odradi pattern matching x i 2, simbol x ce se 
+vezivati za 2 i expr ce biti 100 + 2 = 102. Rezultat je 102.
+
+
+Ovo lici na pozivanje funkcije u ip koja ima jedan parametar x, koji ce biti zamijenjen sa 
+vrijednosti koji se korisit u pozivanju funkcije.
+
+
+Aplikacija je mnogo siri koncept od pozivanja funkcije, jer pozivanje ima samo inicijalizaciju
+parametara.
+
+Pattern match je mnogo mocnija stvar.
+
+
+
+PRIMJERI:
+( fun x -> x ) 5
+5
+
+Definirali smo lambda izraz koji se izvrsi i nazad vrati objekat koji je funkcija.
+Taj objekat se moze aplicirati na vrijednost 5.
+
+Ovo je skupa aplikacija.
+
+x je id koji uvijek uspjeva prilikom pattern matchinga, x se vezuje za 5.
+Izvrsi se ovaj ovdje izraz koji vraca vrijednost x i to je vrijednost 5.
+
+
+
+
+( fun _ -> 25 ) 5
+25
+
+5 se pattern matcha sa _, koji je wc pattern i uvijek se uspijeva vezat sa 5.
+Ali nema nikakvog simbola, nismo 5 ni zasta vezali.
+
+Nazad uvijek vracamo 25.
+
+Sta god da stavim u aplikaciju, uvijek cu dobiti istu vrijednost, kao npr 25.
+
+Zapamtiti:
+Ovo ce se pattern matchirati SA BILO CIM, BILO KOG TIPA.
+
+
+
+
+      *           &
+( fun () -> 25 ) ()
+25
+
+Na mjestu * mora biti uzorak.
+Ovaj uzorak je CP. Ovo je konkretno vrijednost.
+
+Ovo je tipa unit.
+() ce se pattern matchat sa vrijednosti koja je data ovdje &
+
+
+Pattern match uspijeva, a rezultat je rezultat izvrsenja.
+Ova funkcija ce uvijek vratiti 25.
+A tip koji uvijek moram koristiti prilikom pattern matcha da bi ovo uspjelo
+se cak i kompajlirati, to je samo unit.
+
+JOS JEDNOM:
+Ovo se nece pattern matchirati sa bilo cim, vec samo i samo sa ().
+
+
+
+ZAKLJUCAK:              U odnosu na tip koji mozemo dat.
+( fun x -> x ) 5        - Polimorfna lambda funkcija (bilo koji tip).
+( fun _ -> 25 ) 5       
+
+( fun () -> 25 ) ()     - Monomorofna lamda funkcija (samo jedan tip).
+
+
+F# kompajler sam zakljucuje i provjera validnost tipova.
+
+(fun x -> x * 3) 5
+15
+
+Imamo id pattern koji se vezuje za 5 prilikom aplikacije x * 3 = 15
+
+
+
+
+
+
+let foo = fun x -> x * 3 in
+   foo 5
+15
+
+Izvrsi se expr1, nazad dobijemo funkciju.
+foo je simbol koji se vezuje sada za funkciju koju smo dobili.
+
+foo 5 je sada expr2, defakto to je aplikacija!
+
+Aplikacija se izvrsava da se 5 pattern matcha spram ga, koji je ID
+pattern, vezivanje uspije, 5 * 3 = 15
+
+
+
+
+let foo = fun x -> x * 3
+foo 5
+15
+
+Ovo je ista stvar, samo drugaciji zapis.
+
+
+
+
+ZAPAMTITI:
+Aplikacija je izraz koji poslije operatora . ima najveći prioritet.
+
+
+
+Pogledajmo primjer:
+
+let foo = fun x -> x * 3
+foo 5 + 4
+19
+
+
+foo se veze za cijelu funkciju, a onda se izvrsi ovaj izraz, a da bi se izraz
+izvrsio imamo 2 podizraza, aplikacija i plus.
+
+Postavlja se pitanje, jel apliciramo foo na rezultat 5 + 4, ili ce se plus 
+aplicirati na rezultat aplikacije foo od 5, pa tek onda da saberem.
+
+Jel radimo:
+foo(5 + 4)
+ili
+foo(5) + 4
+
+
+Radimo ovo drugo, jer aplikacija ima veci prioritet od bilo koje operacije izuzev .
+
+
+Da bismo ovo doista aplicirali na 5 + 4, onda to ide unutar zagrade!

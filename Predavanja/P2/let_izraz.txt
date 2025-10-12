@@ -1,0 +1,197 @@
+Varijabla je simbol, a simbol moze egzistirati samo u specifikaciji uzorka.
+Uzorak moze egzistirati samo u procesu pattern matchinga.
+A patter matching se dogadja u 4 situacije, izmedju ostalog unutar leta.
+
+
+
+
+|-----------let izraz-----------|
+
+Prvi izraz u kojem cemo forsirati podudaranje uzoraka.
+
+Prvi izraz koji proizvodi podudaranje uzoraka.
+
+Porizvodi i definiciju varijabla - simbola u fp.
+
+Kljucni izraz u F#, dominira kodom.
+
+
+
+
+
+|-----SINTAKSA LET IZRAZA-------|
+__________________________        
+                               pat1 - iskljucivo uzorak
+let pat1 = expr1 in expr2      
+ili                            = - nema veze sa operatorom =, vec samo nacin kako zapisati let izraz 
+__________________________     efektivno delimiter izmedju uzorka i prvog izraza    
+ili                               
+__________________________     expr1 - izraz 1    expr2 - izraz 2      (izraz je nesto sto se izvrsi i vrati vr nazad!!!)
+let pat1 = expr1               Unutar let izraza moraju biti 2 izraza (kao kod npr operatora +) 
+expr2                           
+__________________________     expr1_2 moze biti i drugi let, jer je let izraz. Posto je let izraz, rezultat izvrsenja je vrijednost nekog tipa!!!
+
+
+kada prebacim expr2, mogu izbaciti in.
+
+Koristit cemo obje ove notacije ovisno od potrebe
+
+
+KAKO?
+
+// Sa prezentacije:
+let pat1 = expr1 in expr2
+izvršava se expr1,
+
+dobivena vrijedost se podvrgava procesu poduraranja sa uzorkom označenim kao pat1,
+
+izvršava se vrijednost expr2, bilo kakavo ime korišteno u uzorku se može koristiti 
+unutar expr2 i biće zamjenjeno sa podudarenom vrijednosti koja je povezana sa imenom.
+
+let vraća vrijednost izvršenog expr2
+
+
+
+Format:
+let pat1 = expr1 in expr2
+
+Kako proizvesti vrijednost od ovog izraza?
+
+Prvo se uradi procedura podudaranja uzoraka, izmedju pat1 i expr1 
+
+Rezultat te procedure, moze uspjeti ili ne uspjeti.
+
+Ako uspije, onda:
+- Jedna stvar se sigurno dogadja
+- Druga stvar se mozda dogadja  
+
+
+Ako unutar pat1 postoji simbol, i ako je uspjelo podudaranje pat1 sa expr1
+taj simbol ce se binati za neku vrijednost iz expr1, kompletnu ili dio te vr.
+
+Taj simbol se onda moze koristiti unutar izraza expr2.
+
+Nakon toga ce se izvrsiti expr2 i on ce vratiti vrijednost.
+Ta vrijednost koju dobijem nazad je rezultat let-a.
+
+
+Sada znamo 40% funkcionalnog programiranja.
+
+
+
+Jos jednom, pogledajmo kako ide procedura izvrsenja leta:
+
+1. Pattern matching izmedju pat1 i expr1
+2. Ako uspije - vezivanje simbola iz pat1 ide sa kompletnom ili parcijalnim dijelom
+vrijednosti expr1.
+3. Izvrsenje expr2 i u njemu moze figurirati simbol koji sam bindo u procesu pattern
+matchinga.
+4. Rezultat let-a je vrijednost koju vrati expr2, koji ujedno i definise tip rezultata.
+
+
+Sta se dogodi ako pattern match ne uspije? - Pricamo o tome kasnije. Zivimo u happy svijetu.
+
+
+U uzorku ne mora biti simbol.
+Moze cak i biti a da se ne binda ni za sta.
+
+expr2 moze a i ne mora koristiti simbol.
+
+
+Sta ako se simbol nadje u expr_2. Cime ce se on zamijeniti dok se expr2 izvrsava?
+- Vrijednosti za koju se bindo u procesu pattern matchinga.
+
+
+
+Kako napraviti pattern?
+
+Ima 7 ili 8 razlicitih metodologija kako mogu kreirati uzorke u F#
+i kako se mogu komplikovati.
+Postoji jezik za komponovanje patterna.
+
+
+
+Prva metodologija kako mogu kreirati uzorak je Identifier pattern
+
+Format:
+
+ime    // nekakvo ime, x, foo, bar,..
+podudaranje sa ovim uzorkom uvijek uspijeva i vezuje ime za kompletnu vrijednost koja figurira u podudaranju, pri čemu vrijednost može biti bilo kojeg tipa.
+
+Ako damo ime i stavimo to na mjesto gdje je uzorak, efektivno smo kreirali idetifier pattern.
+To ime je ujedno i simbol.
+
+U let mogu ime staviti u pat1
+
+ovaj pattern ce se podudariti sa bilo cim.
+Kakvu god vrijednost da mu damo, on ce se podudariti sa tom vrijednosti.
+
+
+
+Npr. ako samo znamo identifier pattern  
+
+let neko_ime = expr1 in expr2
+
+Izvrsi se expr1 i nazad dobijem vrijednost.
+Ako je sa lijeva ime, id pattern uspijeva matching i vezivanje.
+To ime se vezuje za kompletnu vrijednost.
+
+Onda to ime mogu koristiti u expr2.
+Kada bude to ime vidjeno u expr2, mijenja se sa kompletnom vrijednosti dobijenom
+od onoga sto sam imao u expr1.
+
+Efektivno, ovo je osnovni nacin kako cu kreirati varijable u F#.
+Ime je vezano za vrijednost koju dobijem izvrsavanjem expr1.
+
+Uzgled receno ovo je metod kako mozemo forsirati izvrsenje necega.
+
+Da bi se dobio nazad rezultat od leta, mora se izvrsiti expr1, prije nego sto se  
+izvrsi expr2.
+
+
+PRIMJERI:
+
+let foo = 25 in 8 + foo          Rezultat let izraza je rezultat expr2 
+Output: 33                       To ime se vezuje za expr1
+                                 Izvrsi se i nazad dobijemo 25 i foo se poveze za tu vrijednost.
+                                 Onda je koristimo u drugom komadu koda, 8 + foo.
+
+
+Nema ovdje memorije nikakve, foo nema memorije i foo je broj 25, kao najbliza intuicija.
+
+let foo = "foo" in 
+  let bar = "bar" in
+    let tar = "tar" in
+      foo + bar + tar
+Outout: foobartar                + operacija je nadovezivanje i rezultat je tipa string.
+
+
+let foo = "foo"
+let bar = "bar" 
+let tar = "tar"
+foo + bar + tar                   
+Output: foobartar                 Ovo je onaj drugi zapis
+  
+
+
+
+let foo = "foo" in 
+  let foo = 5 in
+  foo + 4                         Mutiramo li foo?
+
+Znaci li da isti simbol mozemo bindirati na vise mjesta?
+To je ok ako su u separatnim let izrazima.
+
+
+Sta ako je drugi let embedan u postojeci let?
+Dok god sam unutar scopa trenutnog leta, kada unutar ovog expr 
+trazim vrijednost asociranu sa simbolom, uzima se simbol koji je 
+bindan unutar tog leta.
+
+foo koji je string je vidiljiv u unutarnjem dijelu samo pod uslovom
+da nema istoimenog simbola u istom unutarnjem dijelu.
+Ako bindiamo isti simbol unutra, koristi se taj simbol.
+Usuprotnom nije vidljiv.
+
+Ekvivalent u C++ su u scopovima, lokalne i globalne varijable.
+

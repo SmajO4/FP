@@ -1,0 +1,177 @@
+###############################################
+
+|-> Dodatne informacije <-|
+
+  Predavanja dobijamo u 2 forme:
+
+    - slide forma - prezentacija 
+    - notebook forma - tekst sa kodom koji cemo moci direktno izvrsavati
+
+  Okruzenje za izvrsavanje notebook-sa se naziva Jupyter.
+
+________________________________________________
+
+  .NET platofrma ima nekakve osnovne tipove, koje ujedno koristi i F#
+
+  U osnovi F# targetira .NET, ali moze i npr u JaviScriptu, samim time i Broseru.
+
+  Postoji interoperabilnost programskih jezika na .NET platofmri.
+
+________________________________________________
+
+  UTF-16 je napredniji oblik ASCII tabele.
+
+
+  .NET je specifican po tome sto ima implementiran tip za preciznu reprezentaciju realnih brojeva.
+
+
+  U FP ne koristimo termin pozivanja funkcije, vec apliciranje funkcije.
+
+________________________________________________
+
+  Operatore koristimo da kompunujemo jednostavne izraze u komplikovane izraze.
+
+  Kompozicija ide po pravilima asocijativnosti i prioriteta.
+
+________________________________________________
+
+  Operatori prihvataju samo vrijednosti istog tipa.
+  
+
+  Ovim zakljucujemo da F# kompajler ne radi implicitne konverzije. FP su typeset.
+
+      2 + 1.2 -> compile time error
+
+  Implicitne konverzije u IP nisu nikako pozeljne.
+
+________________________________________________
+
+  Asocijativnost i prioriteti operatora su kao u matematici.
+
+
+
+  Male zagrade se u jeziku koriste striktno za eksplicitno navođenje prioriteta izvođenja.
+
+  U IP zagrade se u toliko konteksta korsite, pozivanje funkcija, if-else, konstrukcija i td.
+
+  Ovdje zagrade se SAMO I SAMO koriste za navodjenje prioriteta.
+
+###############################################
+|-> F# SINTAKSA <-|
+
+  *Komentari:
+
+    // jedna linija      (*
+                            vise linija
+                         *)
+
+
+  *.NET Tipovi
+     
+      TIP     VRIJEDNOST
+    _______________________
+      uint       ()               Najblizi tip u IP je void. unit je skup koji ima jedan element, ().
+
+      bool      true              
+
+      char       'Č'              Skup slova. Nema nikakve veze sa brojevima. Svi karakteri su dozvoljeni.
+                                  Ovo se sve mapira u reprezentaciju koja se zove UTF-16.
+
+     string   "Hello :)"          Nativni tip na .NET platofmri. 
+
+
+
+     signed varijante
+  
+     sbyte       8y               Signed byte. byte je najblizi charu u IP.
+    
+     int16       50s              Signed 2B.
+
+      int        8                32bitni cijeli broj.
+
+     int64       8L               
+
+     int128      42I
+
+
+     unsigned varijante
+
+      byte       8uy 
+
+     uint16      50us  
+
+     uint32      8u
+
+     uint64      8uL
+
+
+     realni brojevi
+
+     float       2.3              U IP je to double.
+
+     float32     2.3f             Isto kao i u IP.
+
+     decimal     2.3M             Precizna reprezentacija realnih brojeva
+                                  0.1 + 0.2 != 0.3
+                                  0.1M + 0.2M = 0.3
+
+
+  *Alternativni zapisi vrijednosti
+
+      65           // 65
+      0x41         // 65
+      0b0100_0001  // 65
+      750_000_000  // 750000000        _ je delimiter
+
+
+  *Konverzije
+
+      byte 2                int -> byte
+      uint32 8.4f           8
+      float 8.4M            8.4
+      char 97               a
+      string 33438          "33438"
+
+
+  *Operatori
+
+      Aritmetički
+        +
+        -
+        *
+        /
+        %
+        **         stepenovanje
+
+
+      Poredjenje:
+        =          na jednakost
+        >
+        <
+        >=
+        <=
+        <>         na razlicitost
+
+      Ucestvuju svi tipovi.
+      Rezultat poredjenje je bool.
+
+
+      Bool
+        not  
+        ||
+        &&
+
+
+      Bitwise
+        &&&
+        |||
+        ^^^
+        ~~~
+        <<<
+        >>>
+
+###############################################
+
+
+
+

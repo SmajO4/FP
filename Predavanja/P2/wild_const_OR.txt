@@ -1,0 +1,189 @@
+Ucimo sve ove bazne uzorke.
+U buducnosti ih zelimo komponovati u kompleksnije uzorke.
+
+
+Naucili smo osnovni uzorak koji se zove ID pattern.
+
+IDP - Identifier Pattern
+WCP - Wild Card Pattern
+CP - Constant Pattern
+ORP - OR Pattern
+
+|------------------WILD CARD PATTERN------------------------|
+
+Format:
+
+_
+
+Podudaranje sa ovim uzorkom uvijek uspijeva, vrijednost sa kojom se vrši podudaranje 
+može biti bilo kojeg tipa, pri čemu se ne vezuje bilo kakvo ime.
+
+
+
+Sastoji se od jednog slova, tacnije _.
+
+_ je zapravo simbol i ne mozemo ga koristiti kao simbol za varijablu.
+
+ID P se uvijek podudari i uvijek poveze simbol sa vrijednosti koju smo koristili u podudaranju.
+WC P se uvijek podudari i ne bude vezivanja.
+
+
+Primjer:
+
+let _ = 25 in 5 + 8
+13
+
+Procedura ide po metodologiji, izvrsi se expr1, sto je 25.
+Podudari se sa _, tacnije podudaranje uspijeva.
+Nema vezivanja, prema tome izvrsi se expr2 i rezultat je 13.
+
+Cijeli let izraz rezultira brojem 13.
+
+
+|------------------CONSTANT PATTERN-------------------------|
+Format:
+
+literal
+podudranje uspijeva samo ukoliko vrijednost koja se koristi u podudaranju identična konstanti korištenoj u literal,
+tip vrijednosti mora biti isti kao tip literal,
+ne vezuje se bilo kakvo ime.
+
+
+Literal - vrijednost bilo kojeg tipa, konstantni uzorak
+
+Literal (konstantni uzorak) ce se podudariti samo sa onim izrazom koji proizvede
+tu identicnu vrijednost.
+
+Efektivno: 
+Literal == rezultat_expr1    -> matchiranje uspijeva
+
+
+PRIMJERI:
+
+let 'a' = 'a' in
+  let 5 = 2 + 3 + 0 in
+     let "foo" = "foo" in
+     3
+3
+
+Ovdje nema nikakvog vezivanja, jer nema IDP.
+
+Za prvi let izraz, expr1 je 'a', koji kada se izvrsi se podudara sa literalom.
+Za prvi let izvrsavamo expr2, koji je drugi let izraz, od kojeg izvrsavamo expr1,
+ciji je rezultat 5 i on se takodjer podudara sa literalom od drugog let izraza.
+
+Kako nastavljamo istom logikom, vidimo da se expr1 treceg let izraza podudara sa 
+njegovim literalom.
+
+Konacno imamo da kao rezultat izvrsenja treceg let izraza, tj njegovog expr2, jeste
+i rezultat cijelog let izraza i to je broj 3.
+
+
+
+
+Pogledajmo prvi put kad se dogodi kada ne uspijeva podudaranje.
+
+let 'a' = 'a' in
+  let 5 = 2 + 3 + 10 in
+     let "foo" = "foo" in
+     3
+
+Microsoft.FSharp.Core.MatchFailureException
+
+
+Prvo podudaranje uspijeva.
+Drugo podudaranje ne uspijeva, 15 se ne podudara sa 5!
+
+
+
+Zapamtiti:
+Podudaranje kada ne uspije tokom izvrsavanja programa u F# rezultira 
+bacanjem iznimke od strane runtime-a., pod uslovom da ista nije uhvacena 
+i tretirana sa nase strane.
+
+|---------------------OR PATTERN----------------------------|
+
+Sada cemo vidjeti kako mozemo komponovati jednostavne patterne u kompleksnije.
+
+Izmedju patterna koristimo operator |
+
+Ovim dobijamo novi pattern koji se zove OR pattern, koji ce matchirati samo pod pretpostavkom da 
+jedan od patterna koji ucestvuju u pipe-u uspije.
+Ako nijedan ne uspije matchirati, javlja se greska u kompjaleru.
+
+
+Format:
+pat0 | pat1 | ... | patn
+
+podudranje uspijeva ukoliko bilo koji od uzoraka pat1, pat2, ..., patn se podudari sa vrijednošću.
+pat1, pat2, ..., pat3 moraju vezivati ista imena da bi se kod mogao kompajlirati.
+
+
+Zapamtiti:
+Ako imamo simbol, onda ga moramo imati u svim patternima!
+Usuprotnom dobijemo gresku u kompajliranju.
+
+
+PRIMJERI:
+
+let 2 | 3 = 3 in
+   let 5 | 6 | 7  = 2 + 4 in
+   "foobar"
+foobar
+let 2 | 3 = 3 in
+   let 5 | 6 | 7  = 2 + 4 in
+   "foobar"
+foobar
+
+
+Imamo dva CP koji u kompoziciji daju ORP.
+
+Redoslijed ide sa lijeva na desno.
+
+Prvo se 2 proba pattern matchirati sa 3 i to naravno ne uspijeva.
+Zatim se 3 proba pattern matchirati sa 3, sto uspijeva, cime prelazimo na sljedecu stvar.
+
+Identicno to radimo za expr2 prvog let izraza koji je zapravo novi let izraz.
+Vidimo da ce se samo 6 podudariti sa 2 + 4, cime prelazimo na expr2 drugog let izraza,
+sto ce predstaviti ujedno i izlaz cjelokupnog let izraza.
+To je foobar.
+
+
+
+let 2 | 3 = 3 in
+   let 5 | 6 | 7  = 18 in
+   "foobar"
+
+Microsoft.FSharp.Core.MatchFailureException
+
+Gresku smo dobili u runtime-u, a ne u kompajliranju.
+
+Kompajliranje je proslo jer je ovo sintaksicki ispravno.
+
+Nije uspio pattern match niti jednog CP, 5, 6 ili 7 sa 18.
+
+
+
+
+let m | 8 = 3 in
+   m
+
+Stopped due to error
+
+
+Sada imamo compile time gresku.
+
+U zapisu patterna imamo pogresno zapisan ORP.
+Individualno su oba okej.
+
+Ali OR podrazumijeva da simbol koji pattern matcham, se mora matchat u 
+svakom individualnom patternu.
+
+
+Zakljucimo nesto za ovaj primjer:
+Ako je desno 8, s lijeva moze biti bilo koja konstanta.
+Ako je lijevo m, desno takodjer mora biti m.
+
+
+Mat indukcija nam kaze da:
+let m | m = 8 je isto sto i let m = 8.

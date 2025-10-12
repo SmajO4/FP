@@ -1,0 +1,178 @@
+REZIME:
+
+*** Patteran ***
+
+  Moguci oblik vrijednosti.
+
+*** Pattern matching ***
+
+  Da li se uzorak podudara sa vrijednosti.
+
+  Moze uspjeti  ili ne.
+
+  Radi i uvijek uspijeva u 4 situacije:
+  *let    *match    *lambda    *iznimke
+
+*** Binding ***
+
+  Povezivanje simbola i vrijednosti.
+
+  Dogadja se ako pattern matching uspije.
+
+  Simbol = varijabla, ime za neku vrijednost
+  To su imena koja se vezu za vrijednost, u cijelosti ili parcijalno, 
+  ako proces pattern matchinga uspije
+  
+
+          SIMBOL <---> VRIJEDNOST
+                   |        
+             Pattern matching
+
+*** Dodatne osobine ***
+
+  1. Dodijeljivanje vrijednosti ne uspijeva uvijek.
+  2. Vezivanje moze proci bez vezivanja ijednog simbola
+  3. Vezivanjem se pravi novo ime za postojecu vrijednost.
+  4. Ponovno vezivanje za isto ime nije moguce. 
+
+|----------------------------- Uzorak (pattern) -------------------------------------|
+
+Predstavlja moguci oblik vrijednosti.
+
+Intuicija
+Cijeli broj ne moze sadrzavati tacku.
+Realni broj to moze.
+
+Na binarnom nivou:
+Cijeli broj, char i sl imaju jednu komponentu (2s complement)
+Realni broj ima 3 komponente (S E M) bilo da je to float ili double varijanta
+
+
+
+Uzorak je moguci oblik neke vrijednosti.
+Ili
+Uzorak je samo oblik.
+
+|-------------------- Pattern matching (podudanje uzoraka) --------------------------|
+
+Procedura kojom se utvrdjuje, da li vrijednost odgovara konkretnom uzorku.
+
+                              uzorak   -> oblik uzorka        // ne znamo kako kreiramo
+Moras imati dvije stvari        +        
+                            vrijednost  -> nesto konkretno    // znamo kako kreiramo
+
+
+            uzorak:  ima 3 komponente, S, E i M
+Ako imamo                                           Da li se ovo podudara? - Aposlutno ne!
+            vrijednost: 2                           Oblik dvice u binarnoj formi ne odgovara tom uzorku.
+
+
+Kljucna stvar za razumijeti:
+Proces podudaranja moze uspjeti, ali i ne uspjeti!
+
+
+
+Gdje ce se raditi pattern matching u kodu?
+*let    *match    *lambda     *iznimke
+
+Efektivno, ovdje se dogadja podudaranje uzoraka!
+
+|-------------------------------Vezivanje (binding)----------------------------------|
+
+Jos jednom:
+
+Pattern matching je procesuda putem koje se provjerava da li vrijednost odgovara uzorku (obliku vrijednosti).
+
+Vezivanje je metodologija povezivanja simbola sa vrijednosti.
+
+Sta je simbol?
+- Simbol cemo mi izmisljati.
+- U fp se simbol naziva varijabla, a nema veze sa varijablom u ip.
+- Prema tome, ovdje je varijabla simbol i predstavlja ime koje smo izmisliti.
+- Za sta? - Pa za neku vrijednost.
+
+Postoje vrijednosti i vrijednostima mozemo dodijeliti imena u procesu vezivanja.
+
+Kada se dogadja vezivanje?
+- Dok traje pattern matching.
+- Dogadja se samo kada pattern matching uspije.
+
+
+  Izmislim        |- vezujem ga -|
+     |            |              |
+     |            |              |
+     |-> simbol --|              |-> vrijednost
+
+              SIMBOL <---> VRIJEDNOST
+                       |        
+                Pattern matching
+
+
+Gdje cemo specificirati simbol?
+- Unutar uzorka.
+
+Ako uspije podudaranje -> simbol iz uzorka ce se vezivati za vrijednost
+koju smo prezentirali u pattern matchingu.
+
+
+Jos jednom:
+SIMBOLI = VARIJABLE
+Simboli su imena koja se vezu za vrijednosti u procesu podudaranja uzoraka,
+ako proces uspije.
+
+Simbol egzistira kao sastavni dio specifikacije uzorka, koji je druga komponenta
+u procesu podudaranja uzoraka.
+
+
+Kako da ovo zapisemo?
+Znamo sta, ali ne znamo kako.
+
+Imamo 4 situacije u kojoj se dogadja:
+- izazivanje pattern matchinga
+- koji ce potencijalno izazvati vezivanje
+- koji ce omoguciti da se simbol veze sa nekom vrijednosti koja ucestvuje u 
+procesu pattern matchinga i to:
+   - u cijelosti
+   - parcijalno (dekompozicija vrijednosti?)
+
+
+
+|-------------Razlike izmedju varijabli u fp i ip----------------|
+
+Postoje fundamentalne razlike između dodjeljivanja vrijednosti varijabli u 
+imperativnom programiranju i vezivanja imena pomoću podudaranja uzoraka.
+
+
+
+1. Dodjeljivanje vrijednosti uvijek uspijeva, što nužno nije slučaj sa 
+vezivanjem.
+    
+    Vezivanje nije separatan proces, vec individualan.
+    Vezivanje jedino radi tokom pattern matchinga, a pattern matching moze 
+    uspjeti ili ne.
+
+
+2. Dodjeljivanje vrijedosti se izvrši minimalno za jednu varijablu, 
+vezivanje može proći bez vezivanja i jednog simbola.
+
+    Cak i ako pattern matching uspije, moze proizvesti da se nikakav simbol
+    zaveze vrijednost.
+
+
+3. Dodjeljivanje vrijedosti rezultira kopiranjem vrijednosti, vezivanjem 
+se pravi novo ime za postojeću vrijednost.
+
+    ip : a = b // procitaj b i kopiraj u a
+
+    fp nema manipulacije memorijom
+    fp : a = b // b je simbol koji se vezao za neku vrijednost
+               // a se vezuje za istu vrijednost kao b
+
+
+4. Ponovnim dodjeljivanjem vrijednosti mijenja se vrijednost asocirana 
+sa varijablom. Ponovno vezivanje za isto ime nije moguće.
+
+
+
+
+  

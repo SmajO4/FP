@@ -1,0 +1,26 @@
+Mutacija inherentno nije pozljena.
+
+U FP ne postoji nesto sto se zove mutacija.
+
+Sve u FP je lamda izraz.
+
+Polimorfizam 
+
+C++ je polimorfan u: 
+  * procesu kompajliranja (template-i, instance)
+  * dok se program izvrsava (virtuelni metodi)
+
+
+C++ u compile-time-u je objektno-orijentiran.
+
+Proracuni koji se desavaju u template-ima je cisti funkcionalni proracun.
+C++ u run-time-u je cisti funkcionalni programski jezik (cak i od F#).
+
+Svi imperativni programski jezici bi htjeli da budu funkcionalni u zadnje vrijeme.
+
+
+Objektno-orijentirani programski jezici poput Jave i C#, obicno nemaju compile-time polimorfizam.
+Ali imaju run-time polimorfizam. 
+12-to predavanje je relativno bitno.
+
+U funkcionalnim programskim jezicima, polimorfizam je obicno u runtime-u.
