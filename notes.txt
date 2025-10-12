@@ -1,3 +1,18 @@
+Ako se desi greska
+remote:
+remote: ========================================================================
+remote:
+remote: ERROR: The project you were looking for could not be found or you don't have permission to view it.
+
+remote:
+remote: ========================================================================
+remote:
+fatal: Could not read from remote repository.
+
+
+  git remote set-url origin git@github.com:SmajO4/FP.git
+
+
 Instaliranje i podesavanje git-a
 
   sudo dnf install git
