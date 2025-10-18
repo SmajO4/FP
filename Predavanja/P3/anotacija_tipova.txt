@@ -9,7 +9,7 @@ ________________________________________________
 ________________________________________________
 
 
-"Najgori programski jezik na svijetu" - Linus Torwalds
+"Najgori programski jezik na svijetu je C++" - Linus Torwalds
 
 
 

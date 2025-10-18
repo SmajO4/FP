@@ -1,0 +1,468 @@
+###############################################
+
+|-> let i funkcije <-|
+
+Naucili smo da let izraz sa funkcijom mozemo pisati kao:
+
+----------------------------------------
+  let fn = (fun pat -> expr 1) in expr2
+----------------------------------------
+
+fn moze biti bilo koji pattern.
+
+
+
+Sintaksicki gledano, alternativni zapis bi imao sljedeci oblik:
+
+----------------------------------------
+  let fn pat = expr1 in expr2
+----------------------------------------
+
+fn sada iskljucivo moze biti ID pattern.
+
+fn deakto postaje funkcija.
+
+Ovaj oblik koristimo.
+
+
+===============================================
+
+//PR1
+
+  let foo = fun x -> x * 3 in foo 5
+
+ALTERNATIVNO:
+
+  let foo x = x * 3
+  foo 5
+
+15
+
+foo je funkcija koja uzima x i vraca x * 3
+
+
+
+----------------------------------------
+
+//PR2
+
+  let bar = (fun x ->  let a = 4 in (let b = 8 in a + b + x)) in 
+  bar 5
+                                jako ruzan zapis
+
+ALTERNATIVNO:
+
+  let bar = (fun x ->           parse error
+  let a = 4                     possible incorrect identation
+  let b = 8
+  a + b + x)                    Potrebna je indentacija
+  bar 5
+  
+ALTERNATIVNO:
+  
+  let bar = (fun x ->           Obzirom na intentaciju zagrade ne trebaju 
+    let a = 4
+    let b = 8
+    a + b + x)
+  bar 5
+
+ALTERNATIVNO:
+
+  let bar = fun x ->           Zapisimo ovo onom alternativnom varijantom. 
+    let a = 4
+    let b = 8
+    a + b + x
+  bar 5
+
+ALTERNATIVNO:
+
+  let bar x =
+    let a = 4
+    let b = 8
+    a + b + x
+  bar 5
+
+
+Definirali smo varijablu, simbol bar koji se vezao za lambdu koja 
+uzima x, a vraca a + b + x
+
+a i b su kao neke lokalne varijable unutar ove funkcije.
+
+###############################################
+
+|-> TIPIZIRANJE <-|
+
+U F# funkcije uvijek moraju uzeti i vratiti nesto.
+
+
+Tip funkcije kao vrijednosti u F# se zapisuje na ovaj nacin:
+
+___________________________________________________
+
+                      t1 - tip vrijednosti koji se moze proslijedjivati
+                           prilikom aplikacije te funkcije
+  t1 -> t2
+                      t2 - tip vrijednosti koji vraca izraz expr koristen
+                           u lambda izrazu kojim je kreirana funkcija
+___________________________________________________
+
+Ovo je tip lambde:
+
+  jedan tim -> drugi tip        tuple (par) tipova
+ 
+
+
+Posmatrajmo ponovo ovaj oblik:
+___________________________________________________
+  
+  let fn pat = expr1 in expr2
+___________________________________________________
+
+pat je taj koji ima informacije o tome, kojeg je tipa lambda.
+
+pat je taj koji determinira tip vrijednosti koja ce se moci koristiti
+kod aplikacije funkcije, tj kod pattern matchinga.
+
+===============================================
+
+
+Do sada smo samo izmisljali ime simbola, kojeg vezemo za lambdu.
+
+Ali simbol mora imati neki tip.
+
+
+Svaki simbol unutar patterna koji izmislimo:
+
+- ili moramo mu dati tip eksplicitno
+
+- ili ako izostavimo davanje tipa, kompajler ce uciniti najbolji effort da 
+  sam zakljuci taj tip.
+
+  To radi na osnovu primjene tog uzorka u aplikaciji tog uzorka u kodu.
+
+
+
+###############################################
+
+|-> ANOTACIJA TIPOVA <-|
+
+Ako zelimo da (eskplicitno) anotiramo - stavimo tip za simbol, to radimo na nacin:
+
+
+                    ime - simbol
+  ime : tip
+                    : tip - ako izostavim, nisam anotirao simbol, vec sam pustio 
+                    kopmajler da sam zakljuci tip.
+
+
+
+
+U nastavku cemo vidjeti primjere anotacija:
+
+________________________________________________
+  let x : int = 3
+  x
+________________________________________________
+
+Rekli smo da je tip za x int.
+
+Kompajler ce tip povratne vrijednosti skontati na osnovu tipa kojeg vrati expr2
+
+
+
+
+
+________________________________________________
+  let x : char = char 97
+  x
+________________________________________________
+
+Razmisljati na nacin da je x simbol koji se MORA zavezati za char.
+
+char je lambda, a char 97 je aplikacija.
+
+
+
+
+________________________________________________
+  let foo : string -> string = fun x -> x + x
+  foo "abc"
+________________________________________________
+
+foo je simbol koji se vezao za funkciju koja prima string i vraca string
+
+foo mora uzeti string i vratiti string
+
+
+
+
+Pogledajmo alternativnu varijantu leta, gdje definiramo funkciju:
+________________________________________________
+  let foo (x:string) : string = x + x
+  foo "abc"
+________________________________________________
+
+
+
+
+________________________________________________
+                                          Ekvivalent u C++:
+  let foo (x:string) = x + x              auto foo(std::string x) {
+  foo "abc"                                   return x + x; 
+                                          }
+________________________________________________
+
+Ovdje je anotiran ulaz, ali ne i izlaz.
+
+Ako zelimo anotirati ulaz, to ide unutar zagrada.
+
+
+
+
+________________________________________________
+                                         Ekvivalent u C++:
+  let foo x : string = x + x             std::string foo(auto x) {  // auto in list of parametars allowed since C++20
+  foo "abc"                                 return x + x;
+                                         }
+                                        // gcc po defaultu koristi C++17
+________________________________________________
+
+Ovdje je anotiran samo izlaz, jer sada nema zagrada.
+
+
+
+Jos jednom, sve sto mi eksplicitno ne definiramo, ostaje kompajleru da odredi.
+
+
+
+
+________________________________________________
+  let foo x = x + x
+  foo "abc"
+________________________________________________
+
+Nismo nista anotirali u ovom slucaju.
+
+Za odredjivanje tipa, kompajler gleda izraz kao i samu aplikaciju.
+
+Tip je: string -> string
+
+
+________________________________________________
+  let foo x = x + x
+  foo 7
+________________________________________________
+
+Primjer identican kao prethodni, osim aplicirane vrijednosti.
+
+Tip: int -> int
+
+
+
+________________________________________________
+
+  let foo x = x + x
+
+  let _ = foo 3 
+
+  foo "foo"
+
+Stopped due to error.
+
+Typecheck error.
+________________________________________________
+
+
+Kompajler vidi 2 aplikacije foo u jednom izrazu.
+
+Jedna aplicira int, druga string.
+
+Ali ono sto je takodjer kompajler zakljucio je da je foo monomorna funkcija.
+
+Iz tog razloga foo se vezuje za jedan i samo jedan tip.
+
+
+
+Zakljucak: 
+
+  Funkcije u F# koje nismo anotirali i aplicirali, su defakto polimorfne sve do 
+  aplikacije istih.
+
+  Onog momenta kada apliciram tu funkciju, time napravim anotaciju, a samim
+  tim i jedinstvenu monomorfnu fnukciju.
+
+
+F# ima mogucnost compiletime polimofizma:
+
+________________________________________________
+
+  let inline foo x = x + x
+
+  let _ = foo 3
+
+  foo "foo"
+
+foofoo
+________________________________________________
+
+
+Kljucna rijec inline, govori kompajleru da funkcije tretira kao template, 
+compile-time polimorfnu funkciju.
+
+
+###############################################
+|->  Funkcije prvog reda <-|
+
+U F# svaka funkcija mora nesto vratiti.
+
+U najmanju ruku, mora vratiti vrijednost tipa unit.
+
+
+Ako funkciju pozovem, a jedina stvar u svijetu koju je ona proizvela je 
+neka vrijednost, onda je to cista funkcija.
+
+Drugim rijecima, cista funkcija je ona koja nema popratnih efekata.
+
+Popratni efekat je nesto sto mijenja svijet.
+
+
+---------------------------------------------------------------------
+unit tip se koristi da se oznace funkcije koje imaju popratne efekte.
+---------------------------------------------------------------------
+
+Primjeri u C-u:
+
+  printf je funkcija koja nesto uzima,  proizvodi popratni efekat, a ne vraca nista.
+
+  getchar je funkcija koja ne uzima nista, a na osnovu popratnih efekata (pritiskom
+  tipki na tastaturi) proizvodi izlaznu vrijednost.
+
+
+-----------------------------------------------------------------------------------
+
+Sve funkcije apliciraju se striktno na jednu vrijednost odgovarajuceg tipa T1
+i vracaju tacno jednu vrijednost odgovarajuceg tipa T2.
+
+
+      Ukoliko funkcija postoji striktno radi popratnih efekata koje obavlja u toku
+      proracuna, onda vraca vrijednsot tipa unit.
+
+
+      Ukoliko funkcija proizvodi povratnu vrijednost striktno na osnovu popratnih 
+      efekata, onda uzima vrijednost tipa unit.
+
+-------------------------------------------------------------------------------------
+
+Kada je F# upitanju, pod pp da obje funkcije koje navodimo postoje u F#, 
+razmisljamo na nacin:
+
+  printf je funkcija koja vraca unit vrijednost.
+
+  getchar je funkcija koja prima unit vrijednost.
+
+
+
+
+
+====================================================================================
+// PR1
+______________________________________________________
+
+  let ``ispisi string`` : string -> unit = printfn "%s"
+  
+  ``ispisi string`` "foo"
+  ``ispisi string`` "bar"
+
+foo
+bar
+______________________________________________________
+
+Metod kako da u simbol stavimo prazno mjesto je da stavimo simbol unutar 
+dvostrukih back-tick quots-a.
+``ime simbola`` 
+
+
+Ako imamo potpis string -> unit
+
+Ovo nam govori da je funkcija popratnog efekta.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+// PR2
+______________________________________________________
+
+  let ``rand to 100`` : unit -> int = fun _ -> Random().Next(100)
+  printfn "%d %d" (``rand do 100`` ()) (``rand do 100`` ())
+
+77
+41
+______________________________________________________
+
+Na osnovu imena i tipa, mozemo zakljuciti sta ova funkcija radi.
+
+Ako funkcija prima unit, to znaci da ona na osnovu popratnih efekata proizvodi
+vrijednost.
+
+
+Kada posmatramo ovaj dio:
+
+  ``rand to 100`` ()
+
+Trebamo razmisljati na nacin da funkcija prima vrijednost tipa unit, a jedina 
+vrijednost tipa unit je ().
+
+###############################################
+
+|->  Funkcije viseg reda <-|
+
+Funkcija je specifikacija proracuna.
+
+Bilo koja funkcija koja uzme ili vrati funkciju je funkcija viseg reda.
+
+Razmisljati na nacin:
+
+  Funkcija koja vraca funkciju, je zapravo proracun koji kada se izvrsi
+  nazad vrati novi proracun.
+
+====================================================================================
+
+// PR1
+____________________________________________________  
+
+  let foo : (int -> int) -> int = fun f -> f 5
+
+  foo (fun x -> x * 3)
+
+15
+____________________________________________________
+
+foo se binduje na funkciju (fun f -> f 5)
+
+Kada se foo pozove, f se binduje na (fun x -> x * 3)
+
+Kada se f pozove sa 5, x se binduje na 5
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+// PR2
+____________________________________________________  
+
+  let foo : int -> (int -> int) = fun x -> (fun y -> x + y)
+
+  (foo 5) 4
+____________________________________________________
+
+foo (identifier pattern) binduje se na funkciju fun x -> (fun y -> x + y).
+
+Kod foo 5: x (identifier pattern) matcha konstantu 5 (constant pattern) i binduje x = 5.
+
+Rezultat je fun y -> 5 + y (closure sa x=5).
+
+Kod (… ) 4: y (identifier pattern) matcha konstantu 4 i binduje y = 4.
+
+Izraz x + y evaluira u 9.
+
+###############################################
+
+

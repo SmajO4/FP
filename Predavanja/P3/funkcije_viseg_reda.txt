@@ -65,7 +65,7 @@ ____________________________________________________
 foo je lambda, tj funkcija, koja kada bude pozvana vratit ce int.
 
 Da bi bila pozvana, moramo joj proslijediti funkciju, jer je foo funkcija
-viseg reda koja jos jedno, kao input ocekuje funkciju.
+viseg reda koja jos jednom, kao input ocekuje funkciju.
 
 
 foo kao input ce dobiti f, a f mora biti funkcija.
