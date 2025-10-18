@@ -1,0 +1,100 @@
+Funkcija je specifikacija proracuna.
+
+Funkcije viseg reda prilikom aplikacija prihvata ili vraca vrijednosti 
+koje su funkcije.
+
+Dakle, bilo koja funkcija koja uzme ili vrati funkciju je funkcija viseg reda.
+
+U F# mozemo napraviti lambdu koja uzima lambdu ili vraca lambdu.
+Cak mozemo napraviti lambdu koja uzima i vraca lambdu.
+
+
+
+Pogledajmo primjer u C++, kako funkcija proizvodi nove funkcije.
+
+
+        // Funkcija foo prima jedan cijeli broj 'x'
+        auto foo(int x) {
+            // Vraća lambda funkciju koja:
+            // - "hvata" varijablu 'x' iz okoline (kopijom)
+            // - prima jedan argument 'b'
+            // - vraća zbir x + b
+            return [x](int b) {
+                return x + b;
+            };
+        }
+
+        int main() {
+            // Pozivamo foo(5), što vraća lambda funkciju koja dodaje 5 na svoj argument
+            auto f1 = foo(5);
+
+            // Pozivamo tu lambda funkciju sa argumentom 10
+            // Dakle: f1(10) = 5 + 10 = 15
+            auto x = f1(10);
+        }
+
+
+Funkcija foo je funkcija viseg reda.
+
+Ona uzima int, a nazad vraca novu vrijednost.
+
+foo je proracun koji kada se izvrsi proizvede novi proracun.
+
+
+f1 je sada novi proracun koji se treba izvrsiti.
+
+Dalje trebamo aplicirati sad nesto na f1.
+
+
+Ovo mozemo uraditi u F# takodjer:
+
+______________________________________________________________
+
+////P1
+
+____________________________________________________  
+
+  let foo : (int -> int) -> int = fun f -> f 5
+
+  foo (fun x -> x * 3)
+
+15
+____________________________________________________
+
+
+foo je lambda, tj funkcija, koja kada bude pozvana vratit ce int.
+
+Da bi bila pozvana, moramo joj proslijediti funkciju, jer je foo funkcija
+viseg reda koja jos jedno, kao input ocekuje funkciju.
+
+
+foo kao input ce dobiti f, a f mora biti funkcija.
+
+Kada pozovem foo funkciju, sa nekom funkcijom, dobijem nazad onog sto bi 
+dobio aplikacijom ove funkcije na broj 5.
+
+
+
+Kada foo apliciram na neku funkciju, dobit cu nazad sta god ta funkcija vrati
+kada ona bude aplicirana na broj 5.
+
+
+
+////P2
+
+____________________________________________________  
+
+  let foo : int -> (int -> int) = fun x -> (fun y -> x + y)
+
+  (foo 5) 4
+____________________________________________________
+
+
+foo je funkcija koja prima int.
+
+foo mi napravi novu funkciju, koja prima int i vraca int.
+
+
+Ja foo dam x, a foo mi napravi funkciju koja ce dobit y, koji ce biti 
+sabran sa x.
+

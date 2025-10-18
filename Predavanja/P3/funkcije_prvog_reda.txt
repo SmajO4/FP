@@ -1,0 +1,139 @@
+U C++ mozemo imati funkciju:
+
+void -> void        citaj: nista -> nista       Ne moze u F#
+void -> nesto                                   Ne moze u F#
+nesto -> void                                   Ne moze u F#
+nesto -> nesto
+
+To nije slucaj kod F#.
+
+U F# svaka funkcija MORA nesto vratiti.
+
+Posebno nam je interesantan tip unit, koji je skup jednog elementa.
+
+Ako gledamo:
+bool -> sluzi za boolovu algebru, logicke operacije
+int -> aritmetika u skupu cijelih brojeva.
+ 
+unit je nesto slicno voidu
+
+Zakljucujemo:
+unit tip se koristi da oznacava funkcije koje imaju popratne efekte.
+
+Popratni efekat je nesto sto mijenja svijet.
+
+Ako funkciju pozovem, a jedina nova stvar u svijetu koju je ona proizvela je neka 
+vrijednost, onda to je cista funkcija.
+
+
+
+Cilj nam je sto vise takvih funkcija napisati, jer imaju dobre matematicke
+osobine, lako se komponuju, lake za rezonovanje i td.
+
+One su lijepe u svijetu programiranja, ali problem je sto one nisu pretjerano korisne.
+
+-----------------------------------------------------------------------------------
+
+Sve funkcije apliciraju se striktno na jednu vrijednost odgovarajuceg tipa T1
+i vracaju tacno jednu vrijednost odgovarajuceg tipa T2.
+
+
+      Ukoliko funkcija postoji striktno radi popratnih efekata koje obavlja u toku
+      proracuna, onda vraca vrijednsot tipa unit.
+
+
+      Ukoliko funkcija proizvodi povratnu vrijednost striktno na osnovu popratnih 
+      efekata, onda uzima vrijednost tipa unit.
+
+-------------------------------------------------------------------------------------
+
+
+Primjer funkcije u C-u, koja proizvodi popratni efekat je printf, za ispisivanje na ekran.
+
+printf uzme nekakve argumente, i ne vraca nista.
+
+
+Kada je upitanju F#, razmisljamo da printf funkcija vraca unit.
+Drugim rijecima, za ta funkcija postoji samo da porizvede popratni efekat i nista vise.
+
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+Primjer funkcije u C-u, koja ne uzima nista, a vraca nesto, ili preciznije, primjer 
+funkcije koja nesto proizvodi, striktno na osnovu popratnih efekata je npr rand ili getchar.
+
+getchar : void -> char.
+
+Ali razmisljajmo za getchar, da mi njem nista ne dajemo, osim tipke za tastature koja je 
+popratni efekat.
+
+Program poziva sistemski poziv, kaze OS-u da program zeli jedno slovo dobiveno sa tastature.
+
+Popratni efekat je involvirao promjenu u svijetu da bi mi dobili taj karakter.
+
+I upravo ta promjena je jedino nesto sto je generiralo rezultat nase funkcije.
+
+
+Dakle:
+
+printf : nesto -> unit
+rand : unit -> nesto
+
+
+===================================================================================
+
+// PR1:
+
+______________________________________________________
+
+  let ``ispisi string`` : string -> unit = printfn "%s"
+  
+  ``ispisi string`` "foo"
+  ``ispisi string`` "bar"
+
+foo
+bar
+______________________________________________________
+
+
+Metod kako da u simbol stavis prazno mjesto je da stavimo simbol unutar 
+dvostrukih back-tick quots-a.
+``ime simbola`` 
+
+Imamo potpis string -> unit 
+
+Ovo nam govori da je ovo funkcija popratnog efekta (jer je povratna vrijednost unit)
+
+
+
+// PR2
+
+______________________________________________________
+
+  let ``rand to 100`` : unit -> int = fun _ -> Random().Next(100)
+  printfn "%d %d" (``rand do 100`` ()) (``rand do 100`` ())
+
+77
+41
+______________________________________________________
+
+
+Na osnovu imena i tipa, mozemo zakljuciti sta ova funkcija radi.
+
+Ako funkcija prima unit, to znaci da ona na osnovu popratnih efekata proizvodi
+vrijednost.
+
+Kada vidimo ovaj poziv 
+``rand to 100`` ()
+
+Trebamo razmisljati na nacin da funkcija prima vrijednost tipa unit, a jedina 
+vrijednost tipa unit je ().
+
+
+// 
+Kasnije na testu, cemo dobiti zadatak gdje cemo samo na osnovu imena i tipova 
+znati sve o API
+//
+
+
+===================================================================================
