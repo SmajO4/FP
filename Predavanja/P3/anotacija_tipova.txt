@@ -1,0 +1,305 @@
+Ako zelimo da (eskplicitno) anotiramo - stavimo tip za simbol, to radimo na nacin:
+
+________________________________________________
+
+                    ime - simbol
+  ime : tip
+                    : tip - ako izostavim, nisam anotirao simbol, vec sam pustio 
+                    kopmajler da sam zakljuci tip.
+________________________________________________
+
+
+"Najgori programski jezik na svijetu" - Linus Torwalds
+
+
+
+U nastavku cemo pogledati metodologije anotiranja tipa u simbolu.
+
+U F# ne postoje implicitne konverzije!
+
+
+
+
+////////////////////////////////////////////////////////////
+
+////PR1:
+
+________________________________________________
+
+  let x : int = 3
+  x
+3
+________________________________________________
+
+Nismo rekli tip za let izraz, vec samo za x.
+
+Ja kao programer sam rekao da je tip od x int.
+
+Kompajler tip povratne vrijednosti, skonta na osnovu tipa koji vrati expr2.
+
+
+////PR2:
+
+________________________________________________
+
+  let x : char = char 97
+  x
+a
+________________________________________________
+
+x je simbol koji se mora zavezati za char.
+
+char 97 je aplikacija.
+
+char je lambda, negdje definisan.
+
+tip od lambde char:
+  
+  bilo_sta -> char
+
+
+
+////PR3:
+
+________________________________________________
+
+  let foo : string -> string = fun x -> x + x
+  foo "abc"
+
+abcabc
+________________________________________________
+
+foo -> simbol
+(string -> string)  ->  (tip simbola)
+
+foo je funkcija koja uzima string, a vraca string.
+
+foo mora uzeti string i vratiti string.
+
+
+
+
+////PR4:
+
+________________________________________________
+
+  let foo (x:string) : string = x + x
+  foo "abc"
+
+abcabc
+________________________________________________
+
+Ovo je alternativna varijanta leta, gdje definiramo funkciju.
+
+Ovdje se radi o sintaksi.
+
+Iz ovog zakljucujemo da je foo funkcija koja uzima string i vraca string.
+
+
+
+
+
+////PR5:
+
+________________________________________________
+                                          Ekvivalent u C++:
+  let foo (x:string) = x + x              auto foo(std::string x) {
+  foo "abc"                                   return x + x; 
+                                          }
+abcabc
+________________________________________________
+
+Funkcija foo je monomorfna.
+
+Ako zelimo x anotirati, to radimo u zagradi.
+
+
+
+
+////PR6:
+
+________________________________________________
+                                         Ekvivalent u C++:
+  let foo x : string = x + x             std::string foo(auto x) {  // auto in list of parametars allowed since C++20
+  foo "abc"                                 return x + x;
+                                         }
+abcabc                                  // gcc po defaultu koristi C++17
+________________________________________________
+
+C++ koristi metodologiju template-a da zakljucuje ovakve stvari.
+
+Drugim rijecima, kada stavimo auto na tip parametra, nismo definirali monomorfnu
+vec polimorfnu funkciju.
+
+Ali kada stavimo auto na povratni tip, nismo definirali polimorfnu funkciju nego
+smo definirali monomorfnu funkciju koju kompajler dok kompajlira kod zakljuci 
+sta je zamjena za auto, na osnovu tipova koji figuriraju u izrazu return.
+
+Kompajler kada se pozove template funkcija, napravi instancu iste koja je postojeca
+i zavrsi u objektnom fajlu.
+Istu mozemo pozivati u bilo kom trenutku.
+Svako novo instanciranje, takodjer ukljucuje kreiranje nove funkcije koja zavrsi 
+u objketnom fajlu.
+
+Instanciranje - praviti od polimorfne verzije monomorfnu verziju funkcije.
+
+C++ da bi imao vise verzija funkcije foo, koristi trik overloadinga, tj na 
+asembler nivou, name mangling.
+
+
+
+////PR7:
+
+________________________________________________
+
+  let foo x = x + x
+  foo "abc"
+
+abcabc
+________________________________________________
+
+Nismo nista anotirali u ovom slucaju.
+
+Jedini izraz u koji mi gledamo je izraz x + x.
+Na osnovu njega moramo zakljuciti tip za x.
+
+
+Kompajler kada gleda:
+
+x - zakljucuje da moze biti bilo koji tip.
+
+Kada nema : pa desno, za foo zakljucuje da ne zna sta ce foo vratiti.
+
+Kada vidi x + x, onda zakljucuje da se tipovi mogu sabirati.
+
+Na osnovu ovog je takodjer zakljucio, tip koji je dat na ulazu, mora 
+biti i na izlazu.
+
+Onda se gleda gdje se foo koristi - u aplikaciji koja koristi string.
+
+Prema tome tip simbola foo:
+string -> string
+
+
+
+////PR8:
+
+________________________________________________
+
+  let foo x = x + x
+  foo 7
+
+14
+________________________________________________
+
+Identicno kao prethodni primjer.
+
+Sada je tip funkcije:
+
+int -> int
+
+
+
+
+////PR9:
+
+________________________________________________
+
+  let foo x = x + x
+
+  let _ = foo 3 
+
+  foo "foo"
+
+Stopped due to error.
+
+Typecheck error.
+________________________________________________
+
+
+Kompajler mora analizirati i anotirati tip za foo.
+
+Ako gledamo
+
+  foo "foo"
+
+Tip foo mora uzeti string, ali i zbog aplikacije mora vratiti string.
+
+  let _ foo 3
+
+Ovo znaci, uradit pattern match i zanemari rezultat.
+Vrijednost kojom ces pattern matchirati je foo od 3.
+
+
+Kompajler vidi dvije aplikacije foo-a u istom izrazu.
+Jedna u kojoj apliciramo int, druga u kojoj apliciramo string.
+
+Kompajler kada je vidio
+  
+  foo 3 
+
+zakljucio je da je foo monomorfna funkcija (nije runtime polimorfna).
+
+Iz ove aplikacije, kompajler je zakljucio da foo treba uzeti int i 
+vratiti int.
+
+
+Obizrom da F# kompajler ide odozgro prema dole, konstatuje notaciju 
+int -> int.
+
+
+-------------------------------------------------------------------
+
+Zakljucak: 
+
+Funkcije u F# koje nismo anotirali i aplicirali, su defakto polimorfne sve do 
+aplikacije istih.
+
+Onog momenta kada apliciram tu funkciju, time napravim anotaciju, a samim
+tim i jedinstvenu monomorfnu fnukciju.
+
+
+
+
+////PR10:
+
+
+F# ima mogucnost compiletime polimorfizam.
+________________________________________________
+
+  let inline foo x = x + x
+
+  let _ = foo 3
+
+  foo "foo"
+
+foofoo
+________________________________________________
+
+
+Ako zelimo da napravimo da F# kompajler tretira funkciju na slican nacin kao
+sto to radi C++ kompajler, postavimo kljucnu rijec inline.
+
+U ovom slucaju kompajler tretira funkciju foo kao template - compile-time 
+polimorfnu funkciju.
+
+Cijeli let ce vratiti string, a foo 3 smo ignorisali, jer ga nismo bindali.
+
+
+Detalj:
+Ako pogledamo kompletnu C++ standardnu biblioteku, 90% koda je polimorfno, kao npr 
+vector, list, sort i td.
+
+Ali recimo std::string nije compiletime polimorfan.
+
+
+Kompletna C++ standardna biblioteka je pisana na nacin da je ne razumije ni jedan
+C# ili Java programer.
+
+
+
+
+
+
+
+

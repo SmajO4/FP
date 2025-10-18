@@ -1,0 +1,158 @@
+Ovo je najbitniji dio oko detalja mehanike tipiziranja.
+
+Zelimo da razumijemo kako rade fpj koji su tipizirani.
+
+
+
+
+Rekli smo da svaka vrijednost ima tip.
+
+Posto se vrijednosti komponuju u izraze, samim time i izrazi moraju imati tip.
+
+Posto je lambda - izraz, onda i ona mora imati tip.
+
+
+============================Tip funkcije====================================
+
+Tip funkcije kao vrijednosti u F# se zapisuje na ovaj nacin:
+
+___________________________________________________
+
+                      t1 - tip vrijednosti koji se moze proslijedjivati
+                           prilikom aplikacije te funkcije
+t1 -> t2
+                      t2 - tip vrijednosti koji vraca izraz expr koristen
+                           u lambda izrazu kojim je kreirana funkcija
+___________________________________________________
+
+Ovo je tip lambde!
+
+Zapamtiti: tip lambde je "jedan tip strelica drugi tip".
+
+Kazemo tuple tipova - par tipova, razdvojeni strelicama.
+
+Ovo nije daleko od reprezentacije lambde u ip.
+
+
+DETALJ:
+U F# funkcije uvijek moraju uzeti nesto i vratiti nesto (za razliku od npr C++).
+
+
+//////////////////////////////////////////////////////
+
+Posmatrajmo ponovo opsti oblik let izraza sa funkcijom:
+
+___________________________________________________
+  
+  let fn pat = expr1 in expr2
+___________________________________________________
+
+Ovaj ovdje pat ce se koristiti kod aplikacije funkcije na pattern matchanje na 
+vrijednost koju budemo koristili u aplikaciji.
+
+Upravo ovaj pat ima info o tome koji tip vrijednosti ocekuje da bude koristen
+prilikom pattern matchanja.
+pat deterimnira tip vrijednosti koja ce se moci koristiti kod aplikacije funkcije.
+
+
+U samom patternu je zakodiran tip stvari koje se mogu koristiti prilikom pattern
+matchinga.
+
+
+
+
+
+===================Binding imena i tipovi============================
+
+Svako ime, koje figurira unutar uzorka koji se podudaranjem veze za neku vrijednost,
+ima tip koji treba da odgovara tipu vrijednosti.
+
+Kompajler sam moze zakljuciti tip (infree) na osnovu konteksta upotrebe uzorka i tipa 
+vrijednosti.
+
+--------------------------------------------------------------------
+
+Mi smo do sada samo izmisljali ime za simbol i to je to.
+
+ALI:
+
+Kada izmislimo ime, mi se vec mozemo commitati skupa sa tim imenom i na tip vrijednosti
+za koji ce se taj simbol bindat - da budemo eksplicitni.
+
+Sjetimo se:
+
+Kod ID patterna, mozemo se vezivati za vrijednsoti bilo kojeg tipa.
+
+Ali mi se mozemo constraintat po tom pitanju.
+
+--------------------------------------------------------------------
+
+Dakle, kada odaberem neki simbol unutar uzorka, on vec unaprijed ima neki tip,
+ili tipsku varijablu (pricamo kasnije, nekakav polimofrizam).
+
+Razmisljamo:
+pattern mora imati neki tip.
+
+--------------------------------------------------------------------
+
+U ip, kad pisemo kod moramo se commitat na tip.
+
+Jedini nacin kako to mozemo izbjeci u C++, mozemo odabrati da tip za taj simbol
+bude template, kako bi izbjegli ovo ogranicenje.
+Ovo je jedna verzija tipske varijable.
+
+C++ je pionir i od jedinih compile time polimorfan.
+
+=========================================================================
+
+ZAKLJUCAK:
+
+Svaki simbol unutar patterna koji izmislimo:
+
+- ili moramo mu dati tip 
+
+- ili ako izostavimo davanje tipa, kompajler ce uciniti najbolji effort da 
+  sam zakljuci taj tip.
+
+  To radi na osnovu primjene tog uzorka u aplikaciji tog uzorka u kodu.
+
+
+JOS BITNIJI ZAKLJUCAK:
+
+Ako posmatramo F#, Haskell, OCaml.
+
+Programer u ovakvim kodovima, nije obavezan da bilo gdje anotira tipove
+(kao sto je to obavezno u C++, izuzev slucaja kada koristimo auto, od C++11).
+
+U pozadini se radi proracun u domenu tipova, kojim se zakljucuju tipovi.
+To se zove type inference.
+
+=========================================================================
+
+// 
+niz stvari proizilazi iz toga koliko je neki programski jezik mocan ili ne.
+
+Npr u C-u nemamo ni template-e, pa moramo koristiti makroe, koji nisu dio C 
+jezika, nego egzistiraju u predprocesoru koji je jezik koji nema veze sa C.
+//
+
+Prece je type inference koristiti sto cesce, tj da sto manje anotiramo kod.
+Ili da ga anotiramo samo po potrebi.
+
+=========================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

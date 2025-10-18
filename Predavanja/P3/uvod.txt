@@ -1,0 +1,70 @@
+Rekli smo:
+
+Kljucna stvar kod funkcionalnog programiranja se vrti oko procedure forsiranja matchiranja
+uzoraka, bindanja i generiranje nekakvih vrijednosti kao rezultat operacije evaluacije 
+izraza koji egzistiraju u nasem kodu.
+
+U Haskellu je na kraju, jedan cijeli program, jedan cijeli let izraz.
+
+Haskell ima sposobnost da kada izvrsava izraze, izvrsava tacno onoliko koliko je potrebno i  
+ne vise od toga.
+Ta sposobnost se naziva lijeno izvrsavanje koda.
+
+Haskell je takodjer specifican po tome, sto svi proracuni moraju biti cisti (samo rezultat u 
+obliku vrijednosti, ali ne i popratni efekti).
+
+Npr. u Haskellu "ispada" da ne mozemo nista ispisati na ekran, poslati paket na mrezu.
+
+Ovakvi programi su laksi za komponovanje i analizu i ne moramo birnuti za popratne efekte.
+
+__________________________________________________________
+
+F# nema proracune koji su cisti.
+
+F# je tipiziran jezik u procesu kompajliranja.
+
+Kompajler prije nego sto prevede ovu u masinac, analizira je li ovo ima simsla sa 
+stanovista tipova.
+
+Dalje, kompajler moze i provjeriti da li je tip aplicirane vrijednosti identicna onom tipu 
+koji funkcija ocekuje da primi kao parametar.
+
+Ako se nista od toga ne slaze - greska u kompajliranju.
+
+F# kao i C++ kod, da bi se izvrsavao, mora se kompajlirati, u procesu koji se zove ahead of time.
+
+U opstem slucaju F# kompajler kompajlira s lijeva na desno, i odozgro prema gore, ali izmedju
+ostalog, analizira individualne izraze.
+
+__________________________________________________________
+
+Svi programski jezici su tipizirani!
+
+Samo je stvar u tome, provjeravaju li se tipovi prije ili poslije izvrsenja.
+
+Npr, Phython to radi dok se kod izvrsava.
+
+__________________________________________________________
+
+Takodjer, rekli smo:
+
+ID pattern se binda za bilo koju vrijednost bilo kog tipa.
+
+Lambda je objekat koji mozemo aplicirati.
+
+Izraz za aplikaciju involira nesto sto je lambda vrijednost i vrijednost nekog tipa.
+
+Kada apliciramo lambdu, onda u tom slucaju forsiramo novi pattern match, i to sa onim
+patternom koji je koristen u definiciji lambde.
+
+( fun x -> x ) 5
+
+5 se veze za pattern x, koji se dalje moze koristiti unutar expr lambde.
+__________________________________________________________
+
+U projektima koje cemo raditi, vidjet cemo da mozemo napraviti involiranu aplikaciju bez 
+popratnih efekata, preciznije, da popratne efekte izoliramo i postavimo na tacno odredjenu
+lokaciju u kodu.
+
+Ovo bi trebao biti ideal svih vrsta programskih jezika.
+

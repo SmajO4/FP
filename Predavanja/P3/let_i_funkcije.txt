@@ -1,0 +1,190 @@
+=====================let i funkcije========================= 
+
+Jedino sto mozemo raditi sa vrijednostima tipa lambde je da ih apliciramo.
+
+Naucili smo da mozemo napisati izraz:
+
+________________________________________
+
+  let fn = (fun pat -> expr 1) in expr2
+________________________________________
+
+fn ovdje, moze biti bilo koji do sad od patterna koje smo radili.
+
+Napisali smo let izraz, sa id patternom.
+
+Desno smo definirali lambdu kao izraz.
+
+Ovaj ID pattern se binda za lambdu i gdje god kasnije u expr 2 koristimo
+fn, efektivno smo pristupili objektu za koji se fn bindo.
+
+To radimo jer zelimo aplicirati lambdu.
+
+
+
+// 
+Razmisljati o tome da ove stvari idu na heap i da tamo egzistiraju sve dok
+nam trebaju (npr, vezani simbol i td).
+
+Postoji garbage collector od .NET koji se brine za te stvari, kao npr. u smislu 
+brisanja kad nam te stvari vise ne budu trebale.
+//
+
+
+
+=============================================================
+
+Alternativno (sintaksicki), ovo ovdje mozemo napisati na sljedeci nacin: 
+
+________________________________________
+
+  let fn pat = expr1 in expr2
+________________________________________
+
+fn ovdje, iskljucivo moze biti ID pattern! (za razliku od gornje varijante)
+
+pat moze biti bilo koji pattern.
+
+
+"Ovo ovdje definira funkciju pod imenom fn, koja ima pattern, expr1 i expr2."
+
+=============================================================
+
+Jos jednom, ovo je identicno, osim siktasicki:
+
+________________________________________
+
+  let fn = (fun pat -> expr1) in expr2
+
+  let fn pat = expr1 in expr2
+________________________________________
+
+
+Mi cemo koristiti drugu varijantu jer je ljepsa.
+
+
+////////////////////////////////////////////////////////////
+
+PRIMJERI
+
+////PR1:
+________________________________________
+
+  let foo = fun x -> x * 3 in foo 5
+
+15
+________________________________________
+
+Definirali smo funkciju, tj simbol foo koji se bindo za lambdu, koja je se 
+dalje aplicirala, i nazad smo dobili rezultat.
+
+foo je funkcija koja uzima jednu varijablu za aplikaciju.
+Kada dobijemo tu vrijednost, pomnozit cemo tu vrijedonst sa 3.
+
+
+\\\\\\\\\\\\\\\\\\\
+
+ALTERNATIVNO:
+
+________________________________________
+
+  let foo x = x * 3
+  foo 5
+15
+________________________________________
+
+foo je funkcija koja uzima x i vraca x * 3
+
+
+
+
+
+////////////////////////////////////////////////////////////
+
+////PR2
+________________________________________
+
+  let bar = (fun x ->  let a = 4 in (let b = 8 in a + b + x)) in 
+  bar 5
+
+17
+________________________________________
+
+bar je nesto sto se binda za funkciju, bar je funkcija koja uzima x, a vraca 
+nazad a + b + x, gdje je a = 4, b = 8, a x je ono sto damo prilikom aplikacije.
+
+C++ notacija:
+x je parametar, a a i b su lokalne varijable unutar funkcije koja je definirana.
+
+
+
+Ovo nam nije nimalo lijepo i citljivo:
+
+\\\\\\\\\\\\\\\\\\\
+
+ALTERNATIVNO:
+________________________________________
+
+  let bar = (fun x -> 
+  let a = 4
+  let b = 8
+  a + b + x)
+  bar 5
+
+parse error
+Possible incorrect identation:
+________________________________________
+
+Parser je komponenta kompajlera koji analizra tekst koji mu das, da bi izvodio 
+zakljucke, da li je taj text validan ili nije, tj jel zadovoljava format.
+
+Potrebno je uvuci sve ispod prve linije:
+
+________________________________________
+
+  let bar = (fun x -> 
+    let a = 4
+    let b = 8
+    a + b + x)
+  bar 5
+
+17
+________________________________________
+
+Ovo sad malo izgleda citljivije.
+
+Ispotavi se da pri ovakoj organizaciji koda (indentacije), zagrada nije potrebna:
+
+________________________________________
+
+  let bar = fun x -> 
+    let a = 4
+    let b = 8
+    a + b + x
+  bar 5
+
+17
+________________________________________
+
+Mozemo uraditi nesto po pitanju ove strelice.
+
+Reprezentirajmo ovo u onoj alternativnoj varijanti.
+
+KONACNO:
+________________________________________
+
+  let bar x =
+    let a = 4
+    let b = 8
+    a + b + x
+  bar 5
+
+17
+________________________________________
+
+Ovo je sada poprilicno lijepo.
+
+Jos jednom definirali smo varijablu, simbol bar koji se vezao za lambdu koja 
+uzima x, a vraca a + b + x.
+
+////////////////////////////////////////////////////////////
