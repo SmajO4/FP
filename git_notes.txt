@@ -1,0 +1,59 @@
+🔹  Kreiranje SSH kljuca:
+
+Provjeriti postojece ssh kljuceve:
+
+  ls -al ~/.ssh
+
+
+🔹 Generisati novi SSH kljuc:
+  
+  ssh-keygen -t ed25519 -C "tvoj_email@domena.com"
+
+enter, enter
+
+
+🔹 Dodati ključ u SSH agent
+
+Pokreni SSH agent:
+
+  eval "$(ssh-agent -s)"
+
+Dodaj novi ključ:
+  
+  ssh-add ~/.ssh/id_ed25519
+
+Provjeri da je učitan:
+
+  ssh-add -l
+
+
+🔹 Kopirati javni ključ u clipboard
+
+Ovim dobiješ javni ključ (.pub) koji ide u GitHub:
+
+  cat ~/.ssh/id_ed25519.pub
+
+Kopirati cijeli ispis
+
+
+🔹 Dodati ključ u GitHub nalog
+
+Ici na GitHub:
+      Settings → SSH and GPG keys → New SSH key
+
+Title: bilo šta opisno (npr. Fedora-laptop)
+
+Key type: Authentication key (ostavi kako jeste)
+
+Key: zalijepi sadržaj koji si kopirao iz .pub fajla
+Klikni Add SSH key
+
+
+🔹 Testiraj vezu
+
+  ssh -T git@github.com
+
+
+🔹 Mozemo raditi push
+
+  git push

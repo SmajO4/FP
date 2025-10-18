@@ -1,0 +1,17 @@
+val x : int = 5 → „Upravo sam definisao x tipa int, vrijednost 5.“
+
+val it : int = 7 → „Zadnji izraz dao je 7 (i trenutno je dostupan pod imenom it).“
+
+val add : int -> int -> int → „add je funkcija koja prima int, vraća funkciju int -> int (currying).“
+
+
+
+let x = 5	“Definiši x kao 5”
+
+let x = 5 in x + 2	“Definiši x kao 5, pa onda izračunaj x + 2”
+
+let x = 5 in ()	“Definiši x kao 5, ali ništa dalje ne radi”
+
+let (a, b) = (2, 3) in a + b	“Raspakuj 2 i 3 na a i b, pa saberi ih”
+
+

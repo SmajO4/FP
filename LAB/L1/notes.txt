@@ -1,0 +1,129 @@
+Zadaca nema, smisljajmo sebi zadatke.
+
+Vise od pola semestra -> 3 provjere
+Na kraju -> 2 projekta, za jedan ce biti provjera, a drugi ce se samo pregledati.
+
+
+Citav F# program je jedan izraz.
+
+Funckionalni programski jezici imaju vise matematicku konotaciju nego programersku.
+
+Generalno koristimo notaciju navodjenja expr2 u novom redu.
+
+Ne smijemo dodavat nikakav indent i F# je vrlo osjetljiv na to. 
+
+Selectujemo kod koji zelimo izvrsiti
+  alt + ENTER 
+
+
+Kada kazemo 
+
+let (a, b, c) = (26, 28, 18)
+
+U ip ovo lici kao lista argumenata.
+
+U F# to i nije bas tako.
+Ovo u F# znaci tuple - uredjeni par
+
+
+Ako vidimo da funkcija uzima nesto ovako u zagradi:
+let f (a1, b1, c1) = (26, 28, 18)
+
+Ova funkcija f ne bi uzimala 3 argumenata, nego uzima 1 argument i taj
+argument je tuple koji sadrzi 3 elementa.
+
+Cim vidimo zarez u F#, vrlo vjerovatno se radi o tuple-u.
+
+Svaka sitnica ima odredjeno znacenje u FP, space, zarez, tab i slicno.
+
+
+Operator za aplikaciju funkcije:
+njeno_ime<space>
+
+
+int ne podrzava operator stepenovanja
+let exp = int two ** q
+
+F# nema implicitnu konverziju.
+Pravila su kompleksna i vecinom rade pogresne stvari.
+
+
+Najblizi jezik F# je Rast, koji je doslovno F# sa {} a ne indentom.
+
+
+Koja je razlika izmedju:
+
+let two : float = 2    Anotacija tipa
+„Imamo simbol two koji se veže za vrijednost 2,
+i eksplicitno kažem da two treba da bude float.“
+
+
+let two = float 2       Eksplicitna konverzija
+„Imamo simbol two koji se veže za rezultat funkcije float 2.“
+
+Rekli smo da je varijabla tipa float i dali joj vrijednost konstante 2.
+Konstata 2 se moze interpretirati u zavisnosti od konteksta koji joj damo.
+
+Odradili smo aplikaciju funkcije float nad konstantom 2 i funkcija float 
+vraca nazad float.
+
+
+Prvo je compile-time statement.
+
+Poziv funkcije se mora odraditi u run-timeu.
+
+
+
+Runtime iznimku generisemo kada se pattern ne podudara.
+
+
+Posmatrajmo sljedeci primjer
+
+
+  let concat = fun a b delimiter -> a + delimiter + b
+
+“Imamo simbol concat koji se veže za lambda izraz.
+Lambda prima tri vrijednosti — a, b i delimiter —
+i vraća rezultat izraza a + delimiter + b.”
+
+
+concat po defaultu, jer mu nista nismo rekli uzima i vraca int.
+
+Defakto ako gledamo prvu liniju, tj tijelo ove funkcije, ona moze
+raditi sa bilo kojim tipom, koji podrzava operator +
+
+
+Ako bi rekli sljedece:
+  let concat = fun (a : string) b delimiter -> a + delimiter + b
+
+Onda ce concat primati i vracati string
+
+  let concat = fun (a : string) b delimiter -> a + delimiter + b
+  concat "Hello" "World" "_"
+
+Ali, ako to ovako uradimo, obzirom da smo na concat vec aplicirali
+stringove, onda ce concat i ostati na tome da prima i vraca string.
+
+
+Kada na funkciju apliciramo jednom nesto to i ostane tako.
+
+
+Tipovi u F# su opcioni i pustamo type checker da sam zakljuci sta je 
+kojeg tipa na osnovu konteksta u kojem se nalazi.
+
+Do ove druge linije se nije znalo kojim tipov radi concat.
+Type difference ne moze zakljuciti tek tako kojeg tipa je concat.
+
+
+
+Nakon ovog, da li mozemo reci:
+
+concat 5 6 7
+
+Ovo se nece kompajlirati, zato sto je vec aplicirano na stringu i type check
+je vec zakjucio tip string i ne moze se predomisliti.
+
+Ako hocemo nesto poput C++ template-se onda u tom slucaju koristimo 
+F# polimorfne funkcije.
+
+
