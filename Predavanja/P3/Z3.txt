@@ -46,7 +46,7 @@ foo je funkcija koja uzima x i vraca x * 3
 
 //PR2
 
-  let bar = (fun x ->  let a = 4 in (let b = 8 in a + b + x)) in 
+  let bar = (fun x -> let a = 4 in (let b = 8 in a + b + x)) in 
   bar 5
                                 jako ruzan zapis
 
@@ -277,7 +277,7 @@ Kompajler vidi 2 aplikacije foo u jednom izrazu.
 
 Jedna aplicira int, druga string.
 
-Ali ono sto je takodjer kompajler zakljucio je da je foo monomorna funkcija.
+Ali ono sto je takodjer kompajler zakljucio je da je foo monomorfna funkcija.
 
 Iz tog razloga foo se vezuje za jedan i samo jedan tip.
 
@@ -390,6 +390,7 @@ Ovo nam govori da je funkcija popratnog efekta.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 // PR2
 ______________________________________________________
+  open System
 
   let ``rand to 100`` : unit -> int = fun _ -> Random().Next(100)
   printfn "%d %d" (``rand do 100`` ()) (``rand do 100`` ())

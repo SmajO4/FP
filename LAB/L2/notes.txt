@@ -1,0 +1,37 @@
+let izraz koji definira funkciju izgleda
+
+Funkcija:
+
+Definiramo ime simbola, parametre, onda treba negdje da se nalazi tijelo:
+- novi red sa indentacijom ili u nastavku
+
+
+x % 2 
+
+-> je nacin kako zapisujemo potpis funkcije
+
+Jos jednom, MatchFailure execption generisemo, kada namjesto da ne bude
+pattern matching.
+To radimo sa constant patternom.
+
+
+let randomNum = random.Next(rangeMin, rangeMax)
+
+
+Ako posmatramo ovu funkciju, ona uzima jedan argument.
+Zasto?
+- Zato sto je ovo tuple, ima zarez izmedju njih.
+
+Kad funkcija uzima vise argumenata?
+Poziv bi izgledao, nema zagrada, nema zareza.
+
+
+Svaka funkcija uzima jedan argument i vraca nazad jednu vrijednost.
+
+
+U C++ smo uzimali funkcije kao argument pomocu:
+  template-a
+  std::function koji je mogao uzeti lambdu ili pointer na funkciju
+
+
+Funkcija u F# je jedan simbol u fajlu.
