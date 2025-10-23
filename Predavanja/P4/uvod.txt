@@ -1,0 +1,40 @@
+Srz funkcionalnog programiranja:
+
+Funkcije viseg reda su bitne jer odredjene tipove kompozicije mozemo 
+raditi na nacin da jednu funkciju komponujemo sa drugom funkcijom da bi 
+dobili trecu funkciju.
+
+Kompozicija funkcija -> neka mocna funkcija koja je korisna.
+
+Platfroma za razvoj web frontenda, bukvalno moze funkcionisati na ovaj nacin.
+
+
+
+============================
+
+Kada posmatramo:
+
+let foo : (int -> int) -> int = fun f -> f 5
+foo (fun x -> x * 3)
+
+
+Strelica je nesto sto predstavlja tip za funkciju.
+
+f je funkcija koju dobijemo kao argument.
+
+Ja apliciram foo na funkciju, a foo vraca nazad ono sto ta funkcija vrati
+kada se pozove sa vrijednosti 5.
+
+
+----------------------------
+
+Imamo i drugu varijantu:
+
+let foo : int -> (int -> int) = fun x -> (fun y -> x + y)
+(foo 5) 4
+
+
+Ti mi das x, a ja ti nazad vratim funkciju koja ocekuje y, koja ceka 
+aplikaciju.
+
+==========================

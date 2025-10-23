@@ -1,0 +1,187 @@
+U svim fpj:                           
+  
+  funkcija -> lambda                  
+
+
+lambda po definiciji:                 U oop, funkcija moze:
+
+  aplicira se na jednu vrijednost       uzeti proizvoljan broj parametara
+
+  vraca jednu vrijednost                vratiti jednu vrijednost (ili cak vise)
+
+
+TIP LAMBDE : TIP1 -> TIP2
+
+
+Sljedeca stvar koja je aplikabilna samo na fp i ni nasta drugo:
+
+---------------------------------------------------------
+|--> Currying <--|
+
+  Tehnika (tzv syntastic sugar) kojom se funkcija koja po definiciji
+  izgleda kao da uzima vise argumenata, transformise u sekvencu 
+  funkcija viseg reda koje uzimaju i vracaju tacno jednu vrijednost.
+
+  Za funkciju koja izgleda kao da uzima vise argumenata kazemo da 
+  je curried.
+
+
+syntastic suggar
+
+  Ti kao programer pises jedno, a kompajler to transformsise 
+  u nesto drugo.
+
+  Definiras funkciju da izgleda kao da uzima vise parametara, a 
+  nazad vrati jednu vrijednost.
+
+currying se podrazumijeva da je syntastic sugar.
+---------------------------------------------------------
+
+Kada budemo definirali ovakvu funkciju, kompajler ce to transformirati 
+u sekvencu lambdi viseg reda koje uzimaju uvijek jedan parametar, 
+vracaju lambde, dok ne dodjemo do lambde koja ce vratiti samo konkretnu
+vrijednost.
+
+===================================================================
+
+
+//PR1:
+
+let foo : int -> (int -> (int -> int)) = 
+    fun x -> 
+      fun y -> 
+        fun z -> 
+          x + y + z
+
+((foo 5) 4) 3                                 Zagrade nisu obavezne
+                                      Vidimo da su sve zagrade sa desne strane.
+
+
+Na kraju kao rezultat od ovog foo vracamo funkciju koja uzima int i vraca int.
+
+Da bi proizvli tu funkciju, prije toga moramo proizvesti funkciju koja ce uzeti
+int a vratiti funkciju.
+
+A prije toga imamo funkciju kojoj damo int, da bi vratila ovu funkciju.
+
+
+"Ti mi das x, ja ti dam funkciju, ti mi das y, ja ti dam funkciju,
+ti mi das z ja ti dam izraz koji ce ti vratiti x + y + z"
+
+foo 5 
+dobijem lambdu koja je closure
+
+(foo 5) 4
+dobijem lambdu koja je closure...
+
+
+
+
+Za definiciju funkcije u ovom obliku postoji syntastic sugar koji ovu funkciju
+reprezentira u currying formi.
+
+U currying formi kada reprezentiras funkciju, onda u tom slucaju funkcija
+uzima vise parametara.
+
+Curring verzija ove funkcije izgleda:
+
+
+    let foo x y z = x + y + z             Ako izostavimo let, identicno u Ocaml-u
+    foo 5 4 3
+
+Zbog curryinga, kompajler moze ovo transformirati u lambdu koja vraca lambdu...
+
+Ovo je mnogo citljiviji kod.
+
+Detalj:
+Druga varijanta je currying forma, dok prva nije!!!
+
+==============================================================
+
+|--> Parcijalna aplikacija <--|
+
+  Curried funkcija je parcijalno aplicirana ukoliko prilikom njene aplikacije 
+  prezentiramo manje argumenata od broja parametara koristenih prilikom njene definicije.
+
+  Rezultat pracijalne aplikacije je funkcija sa manjim brojem parametara.
+
+--------------------------------------------------------------
+
+Dakle ako se vratimo nazad, ovo je curring funkcija:
+
+    let foo x y z = x + y + z       
+    foo 5 4 3
+
+Ali ako to gledamo na ovaj nacin:
+
+
+let foo : int -> (int -> (int -> int)) = 
+    fun x -> 
+      fun y -> 
+        fun z -> 
+          x + y + z
+
+((foo 5) 4) 3                         
+
+Razmisljamo, ako navedemo 
+
+  foo 5
+
+nazad dobijem lambdu.
+To je sasvim ok i to ima ime - parcijalna aplikacija.
+
+Apliciram 
+
+  (foo 5) 4 
+
+dobijem novu lambdu.
+
+--------------------------------------------------------------
+
+//PR2
+
+Imamo funkciju koja je currying funkcija:
+
+
+-------------------------------------
+  let foo x y z = x + y + z 
+
+  let bar : int -> int = foo 2 4
+
+  bar 6
+
+12
+-------------------------------------
+
+Funkcija uzima 3 parametra i toliko joj treba da potpune aplikacije.
+
+Ali mi je apliciramo sa 2 parametra i dajemo vrijednosti za x i y.
+
+Nazad dobijemo onu zadnju lambdu koju bi dobili prije zadnje aplikacije.
+
+
+bar je lambda koja uzima int i vraca int.
+
+z je taj koji jos treba biti apliciran.
+
+
+Ovo bi trebali razumijeti:
+
+-------------------------------------
+let tar = foo 1
+
+tar 2 8
+-------------------------------------
+
+
+
+____________________________________________________________________
+Potrositi koliko je god potrebno vremena u onom okruzenju notebooka.
+
+Potrebno je da se ovo slegne da nam bude kristalno jasno.
+
+Od ovog nam ovisi sve dalje.
+
+Zelimo kasnije napraviti web frontend, tj nekaku aplikaciju koja se 
+izvrsava unutar browsera, koja ce u sebi imati nekakav GUI, i to 
+radimo koristenjem fp.

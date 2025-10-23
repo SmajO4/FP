@@ -37,3 +37,5 @@ printf $"VAL: {xsq10} Deriv: {xderiv10}"
   f' je closure: „zatvara“ (pamti) vrijednosti dx i f čak i nakon što makeDerivative završi—zato je 
   kasnije možeš zvati kao običnu funkciju nad bilo kojim x.
 *)
+
+

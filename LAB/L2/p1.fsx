@@ -22,7 +22,7 @@ printfn "%b" (isEven3 n)
 // ////////////////////////////////
 
 let s x = 
-  x % 2
+  x % 2 
 s(3)
 
 let s2 (x : int) : bool = 

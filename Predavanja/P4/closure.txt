@@ -1,0 +1,123 @@
+closure - zatvaranje
+
+
+Proracun u domenu tipova -> dogadja se dok F# kompajler generise masinski kod.
+
+U domenu tipova imamo:
+  
+  prioritete
+
+  asocijativnost
+
+___________________________________________________________________________
+|  Na nivou proracuna u domenu tipova, operator -> je desno asocijativan. |
+---------------------------------------------------------------------------
+___________________________________________________________________________
+|  Aplikacija je lijevo asocijativna i ima najveci prioritet.             |
+---------------------------------------------------------------------------
+
+Ako posmatramo:
+
+    let foo : int -> (int -> int) = fun x -> (fun y -> x + y)
+    (foo 5) 4
+
+Imamo dva operatora ->
+
+Ako je -> desno asocijativna, onda su nam redundantne zagrade.
+
+Imamo dvije aplikacije.
+
+Ako je aplikacija lijevo asocijativna, ponovo su nam redundantne zagrade.
+
+
+Sada imamo:
+    
+    let foo : int -> int -> int = fun x -> (fun y -> x + y)
+    foo 5 4
+
+
+=============================
+
+     lambda                  JavaScript programeri vole koristiti termin closure
+   _____________________________________________________________________________
+   | funkcija se naziva clousure ukoliko u toku aplikacije koristi ime koje je |
+   | zavezano za neku vrijednost prilikom kreiranja funkcije.                  |
+   -----------------------------------------------------------------------------
+
+                Pattern match 
+Aplikacija -> 
+               Izvrsenje izraza
+
+         pattern
+       /
+Lambda 
+       \
+         expression
+
+                      bindian simbol  
+                  /                   \
+Aplikacija lambde         tokom         => lambad je closure
+                  \                   / 
+                     kreiranje lambde
+
+
+Vratimo se na primjer: 
+
+    let foo : int -> int -> int = fun x -> (fun y -> x + y)
+    foo 5 4
+
+
+U tijelu lambde imam dva simbola, x i y.
+
+y se binda tokom aplikacija, a x se binda pri definiciji funkciji.
+
+x je bindian kad smo aplicirali na 5, ali to nema veze sa onom 
+lambdom koju vracamo kao povratnu vrijednost, vec sa lambdom foo.
+
+lambdu koja je closure vracamo kao rezultat aplikacije foo 5.
+
+
+____________________________________________________________________
+
+Tematika koja se tice garbage collectora.
+
+x je definiran u scope funkcije foo, a izlazi iz scope-a funkcije foo.
+
+Nazad smo vratili x, koji mora biti sa necim povezan i na heapu.
+
+U C++ bi neko nakon sto aplicira ovu funkciju foo 5, sto dobijemo 
+nazad na 4, morao pocistiti x sa heapa.
+To se radi nakon sto mi vise lambda koju sam dobio od foo ne treba.
+
+garbage collector je sastavna komponenta runtime-a od dotnet.
+On vodi racuna o tome da x eliminira sa heapa, kada vise on nikome
+ne bude trebao (tj kada nam lambda ne bude vise trebala).
+
+Dakle, lambda koja je closure, cuva stvari koje su bindirane u trenutku
+kada je lambda definirana.
+
+Dobijemo lambdu, ona cuva x na heapu, tu lambdu apliciramo na 4 i 
+garbage collector uklanja bilo kakvu alociranu memoriju vezanu za lambdu,
+ukljucujuci i one stvari koje je cine closerom, tj simbole za koje
+su zavezani u trenutku kreiranja lambde.
+____________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
