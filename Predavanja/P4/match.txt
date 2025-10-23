@@ -1,0 +1,120 @@
+Jedan novi nacin kako mozemo forsirati pattern match.
+
+match je mozda najcesce koristen za implementaciju buisness logike.
+
+
+__________________________________
+Opšti format:
+
+    match expr with
+    | pat1 -> expr1
+    | pat2 -> expr2
+    ...
+    | patn -> exprn
+__________________________________
+
+Ovo sve skupa je jedan izraz.
+
+Sastoji se od expressiona, koji ce proizvesti vrijednost nekog tipa.
+
+Onda ce se ta vrijednost podvrgnuti matchiranju sa patternima, pocev
+od pat1 do patn, pri cemu bilo koji od pattern matcheva moze uspijeti ili ne.
+
+
+Ako uspije match na pat1, onda ce se izvrsiti expr1 i kompletan rezultat od 
+matcha ce biti ono sto expr1 vrati.
+
+Ako ne dobijemo pattern match, tj pattern match faila, onda predjemo na pat2 
+i probamo njega pattern matchat i ako on uspije vracamo rezultat od expr2.
+
+
+ZAKLJUCAK:
+expr1, expr2, ..., exprn 
+moraju vracati isti tip.
+
+
+Taj tip se unificira sa onim sto treba da vrati match.
+
+
+Da li uvijek uspjeti matchiranje?
+- Ne mora 
+
+
+Mi bismo zeljeli da matchiranje bude exhaustive match 
+u smislu sveobuhvatan.
+
+Ako ne pokrijem sve moguce slucajeve sa ovim patternim, kompajler ce mi 
+dati warning - imas match koji je non-exhaustive.
+
+Ako nijedan od patterna ne uspije.
+- Napravio sam pattern match sa matchom koji nije exhaustive, prezerviram
+vrijednost koja ne matcha ni sa jednim od patterna, onda u tom slucaju 
+cu dobiti runtime exception.
+
+
+Ideja nam je da nemamo runtime exception.
+Ideja nam je da pravimo pattern matching koji je exception.
+Kompajler nam skrene paznju kada to nije.
+
+
+match izraz proces izvršavanja:
+
+     1. Izvršava se izraz expr,
+     2. dobivena vrijednost se podudara sa uzorcima pat1, pat2, ..., patn u redosljedu od prvog ka zadnjem,
+        prvi uzorak koji se podudari prouzrokuje izvršenja asociranog izraza sa desne strane ->,
+        dobivena vrijednost jednog od izraza expr1, expr2, ..., exprn, vraća se kao rezultat izvršenja cijelog izraza.
+
+
+      Ukoliko postoji vjerovatnoća da se niti jedan od uzoraka ne podudari, dobije se upozorenje u kompajliranju.
+      Ukoliko se tokom izvršenja dogodi da se niti jedan od uzoraka ne podudari, generira se iznimka.
+
+
+
+//PR1 
+    match 2 + 3 with
+    | 2 | 3 | 8 -> "foo"
+    | 5 -> "bar"
+    | _ -> "tar"
+
+
+Izvrsi se 2 + 3 dobijemo 5
+
+5 se nece matchati sa 2, 3 ili 8, idemo dalje.
+
+5 se matcha sa 5, izraz se izvrsi i kao rezultat pattern matchiranja dobijemo nazad "bar".
+
+
+Zasto je ovaj pattern match exhaustive?
+
+- Zbog ovog tzv fall backa.
+Pa ako nista odozgo se ne podudari ovo ce se podudariti.
+
+
+U F# kompajler kompajlira odozgro prema dole, a kod se obicno izvrsava odozgro prema dole.
+
+
+
+
+Ovo je sada non-exhaustive
+
+
+// PR2
+
+match 2 + 3 with
+| 2 | 3 | 8 -> "foo"
+| 5 -> "bar"
+bar
+
+Da sam u kodu za kompajliranje u klasicnom F# projektu, dobio bih warning kada se ovaj kod
+kompajlira, jer pattern match non-exhaustive.
+
+
+// PR3
+
+match 2 + 3 with
+| 2 | 3 | 8 -> "foo"
+| 10 -> "bar"
+
+match failure exception
+
+Ovo je sada runtime error jer pattern match nije uspio.

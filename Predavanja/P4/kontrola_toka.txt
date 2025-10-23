@@ -1,0 +1,108 @@
+Kontrola toka je u formi izjava.
+
+|--> if then else <--|
+
+Opšti format:
+
+if expr1 then expr2 else expr3
+
+    Izvršava se expr1:
+
+        u slučaju da je rezultat true, kompletan izraz vraća rezultat izvršenja expr2,
+
+        u suprotnom, kompletan izraz vraća rezultat izvršenja expr3
+
+
+expr1 vraca vrijednost onog tipa koju vrati expr 2 ili expr3.
+
+Zakljucujemo da expr2 i expr3 moraju biti istog tipa.
+
+expr1 mora vratiti bool.
+
+
+//PR1
+
+  if true then 2 + 3 else 100
+5
+
+
+//PR2
+
+  if 2 > 3 then "foo" else "tar" + "bar"
+tarbar
+
+
+// PR3
+  if false then "foo" else 2
+Stopped due to error
+
+expr2 i expr3 moraju biti istog tipa
+
+
+________________________________________________________________
+
+Ukoliko se izostavi else onda kompletan izraz mora vraćati ().
+
+Ako izostavimo else, onda u tom slucaju mora se vratiti unit.
+
+  if true then printf "foobar"
+foobar
+
+
+Ako izostavljam else, onda zasto uopste koristim if izraz je zbog
+popratnih efekata, jer se vraca unit.
+
+  if false then printf "foobar"
+
+I ovo je ok.
+
+false je netacno i nazad dobijemo unit i nikom nista.
+
+
+  if true then 2 + 3
+Stopped due to error
+
+Ovo se ne da kopirati, jer expr2 vraca int!
+
+
+
+Vratimo se na diskusiju da u F# sve vraca rezultat.
+Aplikacija, operatori, if vracaju rezultate - sve su izrazi.
+
+BITNO:
+Uvijek moras iskoristiti vrijednost koju si dobio nazad.
+
+Apliciras funkciju, dobijes rezultat - moras je iskoristiti.
+
+Ako je ne iskoristis, dobit ces warning u kompajliranju.
+Ranije je bio error.
+
+
+Ali ako dobijemo unit nazad, necemo dobiti warning.
+
+
+
+Pogledajmo sta je potpis funkcije ignore
+
+  let t = ignore         'a -> unit
+
+t prima bilo sta, a vraca unit.
+
+Ako kazemo:
+
+  foo 10 |> ignore 
+
+foo 10 nazad vraca 15.
+
+Ja to trebam da iskoristim, da ne bih dobio warning.
+
+Da izbjegnem warning, mogu napraviti da rezultat bude unit od cijelog izraza.
+
+Pa da bih to napravio moram to poslati u ignore.
+
+
+
+Implementacija ignore-a je trivijalna:
+
+  let ignoreisi _ = ()
+

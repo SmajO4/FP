@@ -1,0 +1,10 @@
+Operator >>
+let foo = (*) 5
+
+let bar = (-) 1
+
+let tar = (+) 3
+
+let foobartar = foo >> bar >> tar
+
+4 - 2 |> foobartar

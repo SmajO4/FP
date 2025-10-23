@@ -1,0 +1,55 @@
+Ukoliko se prilikom definicije funkcije doda ključna riječ rec, 
+funkciju je moguće aplicirati unutar izraz kojim se definira funkcija:
+
+  Format:
+  let rec fname pat = expr
+
+
+Ovdje moze biti pat1, pat2, ...
+
+To smo naucili da moze biti zbog curring.
+
+
+Ako ovdje stoji kljucna rijec rec, onda u tom slucaju fname mogu koristiti u ovom expr.
+
+fname imam potrebu da koristim u nekom expresionu da bih aplicirao funkciju.
+
+
+//PR
+
+  let rec sum x = 
+    match x with
+    | 0 -> 0
+    | _ -> x + sum (x-1)
+  sum 1
+1
+
+  sum 4
+10
+
+
+//PR
+  let rec fib n =
+    match n with
+    | 0 | 1 -> n
+    | _ -> fib (n-1) + fib (n-2)
+
+  fib 1
+1
+  fib 2
+1
+  fib 6
+8
+
+
+Ako mi das n jednako 0 ili 1, ja ti nazad vratim n.
+
+Usuprotnom ja ti vratim fib(n-1) + fib(n-2)
+
+
+
+
+Tail 
+
+
+

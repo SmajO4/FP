@@ -1,0 +1,59 @@
+Sljedece sto cemo vidjeti je syntastic suggar.
+
+Metodologija kako mozemo definirati funkciju, da eksplicitno ne imenujemo 
+parametar, i to u formi da kazemo function i idemo sa onim dijelom
+koji vidimo u match expression-u.
+
+
+function            je identicno:      fun x -> 
+| pat1 -> expr1                           match x with
+| pat2 -> expr2                           | path1 -> expr1
+...                                       | path2 -> expr2
+| patn -> exprn                           ...
+                                          | pathn -> exprn
+
+Ovo definira lambdu koja inkorporira u sebi match izraz.
+Samo ga eksplicitno nigdje ne vidimo.
+
+Kompajler ovo na ovaj nacin transformise.
+
+function je isto sto i lambda koja uzima x i matcha x sa ovim dole.
+
+
+Dakle, kada kazem:
+
+let foo = function ...
+
+je isto sto imenujemo
+
+let foo = fun x -> ...
+
+
+foo bi bio funkcija koja uzima x i pattern matcha ga na ove pattern.
+Samo sto ne egzistira x.
+Sta god da uzme, matchat ce se.
+
+
+
+
+//PR1
+  let foo = function 
+    | "foo" -> true
+    | _ -> false
+
+  foo "bar"
+False
+
+Vidimo da smo definirali lambdu koja uzima x i pattern matcha ga na foo.
+x mora biti tipa string.
+
+Ovo se pise kao 
+
+fun x -> match x pa ovo dole.
+
+Ako ce se x matchat sa "foo" a "foo" je string, onda x mora biti string.
+
+
+
+  foo "foo"
+True

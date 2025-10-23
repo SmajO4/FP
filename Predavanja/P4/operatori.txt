@@ -1,0 +1,184 @@
+Zelimo izmisliti alternativnu algebru za tipove koje mi izmislimo.
+
+C++ je od prvih oopj u kojem je moguce definirati operatore.
+U C++ ne mozemo izmisljati novi operator.
+U F# mozemo izmisljati tipove, ali ne mozemo mu dodjeljivati prioritet i 
+asocijativnost.
+U Haskelu mozemo izmisljati tipove i cak eksplicitno reci koji prioritet i 
+asocijativnost taj operator moze imati.
+
+U C# i Javi originalno nismo mogli definirati operatore.
+
+Mi cemo praviti tipove, za koje cemo praviti operatore.
+
+U F# mozemo izmisliti nove operacije, sto znaci da ako posmatramo
+oeprator + on reprezentira operaciju sabiranja, ja mogu izmisliti
+novi simbol koji ce predstavljati operaciju foobariranja i moze 
+biti binaran ili unoran.
+
+Eh sada, ja bih morao razmisljati, obzirom da ce se moj operator
+komponovati u komplikovane izraze, odma cu morati razmisljati 
+za taj moj izmisljeni operator, koji mu je prioriter i koja mu je 
+asocijativnost.
+
+U F# ne mozes za izmisljeni operator foobariranja eksplicitno reci
+koja je njegova asocijativnost ili prioritet.
+
+Pa sta ce onda mu biti prioritet?
+
+- Postoji pravilo po kojem F# izvodi implicitno prioritet i asocijativnost
+za nas operator kojeg izmislimo.
+
+|--> Operatori <--|
+
+Funkcija čije je ime u formi (simboli), a koja uzima 
+dva parametra je efektivno binarni operator.
+
+Funkcija čije je ime u formi (simboli), a koja uzima 
+jedan parametra je efektivno unarni operator.
+
+simboli u definiciji operatora su sekvenca sljedećih karaktera: 
+!%&*+-./< = >?@^|~ (Oni koji vec figuriraju)
+
+--------------------------------------------------------------
+
+Operator nije nista drugo do lambda cije je ime same lambde u formi:
+( nekakva lista simbola )
+
+Ako kreiramo funkciju () i nekaka unutra lista simbola, koju je 
+definirao Microsoft.
+
+
+
+Operatori se pored prefiks forme mogu aplicirati i u infiks formi, pri čemu se 
+izostavljaju zagrade () iz imena operatora, i dodatno:
+
+binarni operator se pojavljuje između argumenata,
+unarni operator se pojavljuje nakon argumenta.
+
+
+Ako kazemo: 
+
+  let foo x y = ...
+
+Ovo nije operator jer foo nije u zagradi.
+
+
+Ovo je primjer binarnog operatora:
+
+  let (.>) x y = ...
+
+Ovo nije nista drugo do funkcija koja se zove (.>)
+koja je u currying formi jer uzima x i y.
+
+Ovo je primjer unarnog operatora:
+
+  let (.>) x 
+
+
+
+-------------------------------------------------
+
+Prioritet i asocijativnost bi se utvrdjivao na osnovu
+simbola koji se koriste u zagradi pocev od prvog simbola.
+
+
+let (.>) x y - operator foobariranja
+
+Pravilo:
+
+  Ako je tacka na listi simbola, njega preskacemo u odredjivanju
+  prioriteta i asocijativnosti.
+
+Sljedeci simbol je >.
+
+Prema tome, operator foobariranja ima prioritet kao sto ima vece
+i prioritet kao sto ima vece, a to je lijeva asocijativnost.
+
+
+
+Kada bi rekli:
+
+let (@<) x y - operator tarbariranja
+
+Opeator @ je definiran u dotnet standardu i ima veze sa listama.
+Desno je asocijativan i ima vrlo nizak prioritet.
+Upitanju je prioritet nizi od aritmetickih i logickih opreacija.
+
+Operator tarbariranja je desno asocijativan zbog operatora @
+sa relativno niskim prioritetom.
+
+
+
+// PR1
+
+    let (@+) x y = x + y + 1     desna asocijativnost zbog @
+
+    let (!-) x = -x - 1          uzled receno jedino na unarnim 
+                                 operatorima sta ima smisla koristiti
+                                 kao prvi karakter je !
+
+    (@+) 2 4                     apliciram operator
+7
+
+// PR2
+
+    (!-) 3                       apliciram na 3
+-4
+
+
+Operatori se pored prefiks forme mogu aplicirati i u infiks formi, 
+pri čemu se izostavljaju zagrade () iz imena operatora, i dodatno:
+
+      binarni operator se pojavljuje između argumenata,
+      unarni operator se pojavljuje nakon argumenta.
+
+
+prefiks forma - definirani operator apliciram kao obicnu funkciju
+
+infiks forma - u slucaju binarnog operatora, 
+               operator se nalazi u sredini bez zagrada, a sa lijeve
+               i desne strane su prvi i drugi argumenti, respektivno
+
+
+
+  let (@+) x y = x + y + 1
+  let (!-) x = -x - 1
+
+  2 @+ 4             Vidimo da smo izgubili zagradu
+7
+
+  !- 3
+-4
+
+
+---------------------------------------------------
+
+Ista pravila vaze za standardne F# operatore!
+
+Npr. ovo apliciranje operatora + i to u prefix formi:
+
+(+) 3 4;
+
+
+Plus je negdje definiran na ovaj nacin:
+
+let (+) x y = ...
+
+
+
+Mozemo i redefinirati standardni operator:
+
+Redefinirana verzija ce u mom kodu uzeti primar na 
+postojecu.
+
+
+Ja mogu u kodu mogu staviti sljedecu stvar:
+
+let (+) * y = x + y + 1
+
+
+Sada kada saberem 2 + 3, cemo dobiti 6.
+
+
+

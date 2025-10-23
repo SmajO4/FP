@@ -1,0 +1,106 @@
+Tail rekurzivne funkcije
+Ukoliko se unutar definicije rekurzivne funkcija njena aplikacija ne komponuje u kompleksniji izraz, za funkciju kažemo da je tail rekurzivna.
+
+tail rekurzivne funkcije kompajler može značajno optimizirati.
+let sum_tr x =
+  let rec loop a n =
+    match n with
+    | 0 -> a
+    | _ -> loop (a + n) (n - 1)
+  loop 0 x
+
+sum_tr 4
+10
+
+
+Ovo je implementacija tail rekurzivne funkcije sum_tr.
+
+
+Tail rekurzivna funkcija rezultat svoje aplikacije unutar svog tijela, nece 
+komponovati u kompleksniji izraz.
+
+Ako je apliciram i rezultat s necim komponujem, ona vise nije tail rekurzivna.
+
+
+Pogledajmo:
+let rec sum x = 
+  match x with
+  | 0 -> 0
+  | _ -> x + sum (x-1)
+
+
+Ovo nije tail rekurzivna, jer rezultat aplikacije rekurzivne funkcije komponujem sa x +
+
+Ni fibonaci nije tail rekurzivna.
+
+
+let fib_tr n =
+  let rec loop a1 a2 n =
+    match n with
+    | 0 -> a1
+    | 1 -> a2
+    | _ -> loop a2 (a1 + a2) (n - 1)
+  loop 0 1 n
+
+fib_tr 6
+
+
+Ovo je tail rekurzivna funkcija funkcije fib
+
+
+
+
+ZAKLJUCAK:
+Tail rekurzivnu funkciju je komplikovano napisati.
+
+
+Zasto je ovo korisno?
+
+U FP non-tail rekurzivne funkcije se nazivaju naivnim implementacijama.
+
+
+
+#!time
+  fib 45
+
+1134903170
+
+  Wall time: 8888.9067ms  
+
+#!time
+  fib_tr 45
+
+1134903170
+Wall time: 11.0742ms
+
+
+
+U Jypiter notebooku postoji nesto sto se zovu magic funkcije.
+Prepoznajemo ih po #
+
+#!time  
+Ovo je magic direktiva za okruzenje da zelim da pored rezultata izvrsenja izraza 
+koji je u celiji, zelim da mjerim vrijeme koliko treba da se izvrsi izraz.
+
+
+tail rekurzivna varijanta je za 3 magnitude brza od one koja nije tail rekurzivna.
+
+
+
+Ne postoji algoritam da se od non-tail rekurzivne napravi tail rekurzivna funkcija.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

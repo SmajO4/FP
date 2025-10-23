@@ -1,0 +1,233 @@
+F# editor:
+tipove zakljucuje kompajler, okruzenje je konektovano 
+u pozadini na linker od dotnet koji analizira kod i 
+prezentira nam ove stvari.
+
+References - pise koliko puta smo koristili kod.
+
+--------------------------
+|--> Operator |> <--|
+
+    let foo = (*) 5
+
+    let bar = (-) 1
+
+    4 - 2 |> foo |> bar
+-9
+--------------------------
+
+foo je lambda, nastala parcijalnom aplikacijom operatora * na 5.
+
+U operator * smo zamijenili lijevi operand.
+
+Ostalo je da se aplicira desni operand.
+
+bar je isto parcijalan, 1 - nesto.
+
+--------------------------
+    let (|>) v f = f v
+
+    4 - 2 |> foo |> bar
+-9
+--------------------------
+
+|--> Operator <|  <--|
+
+    let foo = (*) 5
+
+    let bar = (-) 1
+
+    bar <| ( foo <| 4 - 2 )
+-9
+
+
+
+    let (<|) f v = f v
+
+    bar <| ( foo <| 4 - 2)
+-9
+
+____________________________________________________
+PRIMJERI:
+
+
+  2 + 3 |> printf "%A"
+
+|> je binarni operator.
+
+Apliciran je u infix formi.
+
+printf je currying funkcija, jer prima vise argumenata.
+
+
+Za ovo mora negdje biti definicija:
+
+  let (|>) a f = f a
+
+a - bilo sta defakto.
+Za ovaj slucaj, a je 5, a f je printf
+
+Operator |> uzima neku vrijednost i funkciju.
+
+  // 'a ima veze sa polimorfizmom
+
+  let foo = (*) 5
+
+  let bar = (-) 1
+
+  let a = 5;
+
+  ili
+
+  let a = 5 |> foo
+
+Ovdje kazemo, ti mi das vrijednost i funkciju.
+Ja ti nazad vratim vrijednost koju dobijes kada apliciras funkciju.
+
+Sto bi neko koristio |> kad vec moze direktno aplicirati funkciju
+na argument.
+
+
+Ako kazemo:
+
+  let a = 5 |> foo |> bar
+
+Ajmo ovo probat procitat:
+
+Uzmemo 5 i proslijedimo ga u foo i rezultat koji dobijemo kada 
+foo apliciras na 5, proslijedi u bar i nazad dobijes ono sto 
+bar vrati.
+
+
+U notaciji bez operatora |> bi ovo zapisali:
+
+  let a = bar foo 5
+
+Kompajler prvo razmislja aplicirati bar na foo
+
+Ovo je greska, jer je aplikacija visokog prioriteta i lijevo je 
+asocijativan.
+
+Ovo je ispravno, i trebaju zagrade:
+
+  let a = bar (foo 5)
+
+
+
+Vratimo se ponovo:
+
+  let k = 5 |> foo |> bar
+
+Zakljucujemo da je ovo ljepsa notacija.
+
+Dodajemo jos jedan nivo:
+
+  let k = 5 |> foo |> bar |> (/) 25
+
+Ovo znaci:
+Posalji 5 u foo, dobijeni rezultat posalji u bar, dobijeni rezultat
+posalji u funkcij (/) koja ce podijeliti 25 sa tim brojem, koji si dobio.
+
+
+Ovo zapisujemo na ovaj nacin:
+
+  let k = 25 / (bar (foo 5))
+
+Ovo je prilicno tesko parsirati.
+
+F# programeri vole pipe operator.
+
+
+
+
+Ajmo sada razmisljati ovako.
+
+Sta ako hocu da radim ovo:
+
+  let a = foo <| 5
+
+Ovo znaci isto samo u suprotnom smijeru.
+
+Pipe u drugom smjeru je definiran na nacin:
+
+  let (<|) f a = f a 
+
+
+Obratiti paznju da su obje ove funkcije, |> i <| funkcije viseg reda
+jer ocekuju f kao input ili output.
+
+  'a -> ('a -> 'b) -> 'b
+
+Gdje god vidimo ' pa nesto, to je kao u C++ T od tamplete-a.
+
+
+Pogledajmo operator |>
+
+Koju asocijativnost ima ovaj operator?
+
+- Lijevu asocijativnost i prioritet od pipe.
+
+Pipe ima nizi prioritet od aritmetickih operacija i od vecine logickih opreacija.
+
+  let z = 3 + 2 * 5 |> foo
+
+Svi ovi operatori imaju veci prioritet od |
+
+
+
+Lijevi <| ima prioritet kao manji.
+
+Manji ima veci prioritet od pipe.
+
+Asocijativnost od < je lijeva.
+
+
+Kada zapisemo ovo ovako:
+
+  let a = 5 |> foo |> bar
+
+smjer kretanja podataka je sa lijeva na desno zbog asocijativnosti
+ovog operatora.
+
+Ako koristimo <| operator, da smjer podataka ide s desna na lijevo,
+onda bi bilo logicno da ovo bude zapisano:
+
+  let a = bar <| foo <| 5  Greska u kompajliranju
+
+Ovo je pogresno.
+
+Greska je vezana za asocijativnost.
+
+< je lijevo asocijativan, pa je i <| lijevo asocijativan.
+
+To bi znacilo apliciraj bar na foo.
+
+Rijesenje je ovo:
+
+  let a = bar <| (foo <| 5)
+
+Ali ovo vecina F# programera ne koristi, zbog ovog problema.
+
+
+Ajmo izmisliti novi operator:
+
+  let (@<) f a = f a
+
+Sada imamo:
+
+  let a = bar @< foo @< 5
+
+Ovo je sada ok jer je @ lijevo asocijativan.
+
+Ali ovo ne izgleda lijepo.
+
+
+
+Zasto <| u Haskellu nije problem?
+
+- Mozemo mijenjati prioritet i asocijativnost.
+
+
+
+
+

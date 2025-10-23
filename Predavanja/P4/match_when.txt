@@ -1,0 +1,55 @@
+Mogu komponovati match sa when.
+
+when se u tom slucaju zove guard.
+
+  match expr with
+  | pat1 when ce1 -> expr1
+  | pat2 when ce2 -> expr2
+  ...
+  | patn when cen -> exprn
+
+            ce1, ce2, ... cen su dodatni izrazi, tzv. guard, koji:
+            moraju vraćati bool vrijednost,
+            izvršavaju se samo ako se njihov korespondirajući uzorak pat1, pat2, ..., patn podudari,
+            dodaju dodatni uslov da bi se kompletno podudaranje smatralo uspiješnim kako bi se izvršio jedan od izraza expr1, expr2, ..., exprn
+
+
+Dakle when je opcion.
+Ali ako ga imam onda moram imati ce.
+
+ce je izraz koji kada se izvrsi vraca bool.
+
+Predstavlja guard za taj konkretno case pri matchiranju.
+
+
+Izvrsit ce se samo onaj expresion koji zadovolji dvije stvari ova vrijednost.
+
+Dakle dobili smo vrijednost koja ide u pattern match.
+
+Prvo se matchira sa pat1 i ako uspije, onda se izvrsi ce1.
+Ako ce1 proizvede tacno, tada se izvrsi expr1, a ako proizvede false, idemo dalje.
+
+
+//PR 
+
+let foo x y = 
+  let z = x + y
+  match z with 
+  | z  when x > y -> "foo"
+  | _ -> "bar"
+foo 2 3
+bar
+
+Dobio sam x i y, izracunam x + y i matcham sa z.
+kazemo x > y i ako je zadovoljeno, ako ne idemo dole.
+
+Ovo ce biti najcesci nacin kako buisness logiku implementiramo.
+ifova ce vrlo rijetko bit, a match cemo vrlo cesto koristiti.
+
+
+Dakle, znamo sada uslovno raditi nesto u odnosu na vrijednosti koja nam je prezentirana.
+
+Fali nam jos jedna stvar da bi mogli napraviti program - ponavljanje.
+
+Nema for i while.
+Jedina stvar da ponavljam stvari je pomocu rekurzija.
