@@ -1,5 +1,5 @@
 // Napisati funkciju between koja uzima tri integer-a
-// (lo, hi i x) i provjerava da li ej argument x izmedju
+// (lo, hi i x) i provjerava da li je argument x izmedju
 // vrijednosti la i hi, ukljucujuci obje vrijednosti.
 
 // Nakon toga definirati simbol isWorkingClass koji 
@@ -10,18 +10,21 @@
 // isWorkingClass treba biti definiran parcijalnom 
 // aplikacijom funkcije between
 
+// Sve izraze anotirati tipovima
 
-let between (lo : int) hi x =
-  lo <= x && x <= hi
+// 1️⃣ Definicija funkcije between
+let between (lo : int) (hi : int) (x : int) : bool =
+    lo <= x && x <= hi
 
-// kako cemo definisati simbol koji se zove isWorkingClass
+// 2️⃣ Parcijalna aplikacija
+// between očekuje 3 argumenta: lo, hi, x
+// Ako unaprijed zadamo lo = 22 i hi = 65,
+// dobijamo novu funkciju koja čeka samo x.
+let isWorkingClass : int -> bool = between 22 65
 
-(* let isWorkingClass = ; *)
-
-
-// TEST:
-let ages = [ 12; 18; 25; 130; 67; 0 ] 
-let workingClasses = ages |> List.filter isWorkingClass
+// 3️⃣ Test
+let ages : int list = [ 12; 18; 25; 130; 67; 0 ]
+let workingClasses : int list = ages |> List.filter isWorkingClass
 printfn "%A" workingClasses
 
 

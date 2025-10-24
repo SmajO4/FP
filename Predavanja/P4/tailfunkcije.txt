@@ -1,5 +1,6 @@
 Tail rekurzivne funkcije
-Ukoliko se unutar definicije rekurzivne funkcija njena aplikacija ne komponuje u kompleksniji izraz, za funkciju kažemo da je tail rekurzivna.
+Ukoliko se unutar definicije rekurzivne funkcija njena aplikacija 
+ne komponuje u kompleksniji izraz, za funkciju kažemo da je tail rekurzivna.
 
 tail rekurzivne funkcije kompajler može značajno optimizirati.
 let sum_tr x =

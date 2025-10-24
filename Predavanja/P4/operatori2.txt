@@ -217,7 +217,7 @@ Sada imamo:
 
   let a = bar @< foo @< 5
 
-Ovo je sada ok jer je @ lijevo asocijativan.
+Ovo je sada ok jer je @ desno? asocijativan.
 
 Ali ovo ne izgleda lijepo.
 

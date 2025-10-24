@@ -1,0 +1,677 @@
+Funkcije vise reda su bitne.
+
+Pomocu njih komponujemo one funkcije koje su korisne
+
+
+
+U svim funkcionalnim programskim jezicima:
+funkcija <-> lambda
+
+Lambda po definiciji:
+aplicira se na jednu vrijednost -> vraca jednu vrijednost
+
+Tip lambde:
+tip1 -> tip2
+
+
+===============================
+|--> Prioriteti <--|
+                    
+                        asocijativnost
+U domenu tipova gledamo: 
+                          prioritet
+
+
+|------------------------------------|
+| Na nivou proracuna u domenu tipova |
+| Operator -> je desno asocijativan. |
+|------------------------------------|
+
+|---------------------------------------------|
+| Operator aplikacije je lijevo asocijativan. |
+| Operator aplikacije ima najveci prioritet.  |
+|---------------------------------------------|
+
+Na onosvu ove cinjenice, zagrade su ovdje (*) redundantne:
+                   *          *
+  let foo : int -> (int -> int) = fun x -> (fun y -> x + y)
+  (foo 5) 4
+  *     *
+===============================
+|--> Closure <--|
+
+Lambda je closure ako u toku aplikacije koristi nekakvo ime 
+koje je zavezano tokom definicije te iste lambde.
+
+Closure funkcije obicno nastaju kod funkcija viseg reda.
+
+// PR
+
+  let foo : int -> int -> int = fun x -> (fun y -> x + y)
+  foo 5 4
+
+foo 5, proizvodi closure lambdu, jer ce se 5 zavezati za x, 
+gdje kao rezultat ove aplikacije dobijamo:
+
+fun y -> 5 + y
+
+i vidimo primjer kada tokom definicije lambde dobijemo 
+funkciju koja ima zavezano ime za vrijednost (x -> 5)
+
+===============================
+|--> Currying <--| 
+
+            (tehnika - eng. syntastic sugar)
+      
+       Currying je tu radi bolje citljivosti koda
+                  
+     "ti pises jedno, a kompajler ti da nesto drugo"
+
+                        TANSFORM.
+    Currying funkcija ------------> Sekvencu lambdi
+
+    Lambde vracaju lambde dok ne dodjemo do konkretno
+                 jedne vrijednosti
+
+------------------------------------------------------------
+Funkcija koja izgleda kao da uzima vise argumenata, kao npr:
+
+  let foo a b c = ...
+
+se transformise u sekvencu instrukcija viseg reda koje 
+uzimaju i vracaju tacno jednu vrijednost, konkretno:
+
+  let foo = fun a -> fun b -> fun c = ...
+------------------------------------------------------------
+
+Obratiti paznju. Aplikacije na foo:
+
+Sa jednim argumentom:
+
+  foo 1:          int -> (int -> int -> int)
+                  
+                         \                /
+                   Dobijem lambdu koja je closure
+                      Zavezan a pri definiciji
+
+Sa dva argumenta:
+
+  foo 1 2         int int -> (int -> int)
+
+                              \        /
+                   Dobijem lambdu koja je closure
+                      Zavezan b pri definiciji
+
+Sa tri argumenta:
+
+  foo 1 2 3       int int int -> int
+
+
+
+//PR
+let foo : int -> (int -> (int -> int)) = 
+    fun x -> 
+      fun y ->                          non-currying form
+        fun z -> 
+          x + y + z
+
+
+
+let foo x y z = x + y + z               currying forma 
+
+
+Dodatno:
+
+printf je currying funkcija, jer prima vise (proizvoljan
+broj) argumenata.
+
+===============================
+|--> Parcijalna aplikacija <--|
+
+Curried funkcija kao npr:
+  
+  let foo a b c = a + b + c
+
+je parcijalno aplicirana ukoliko prilikom njene aplikacije
+navedemo manje argumenata od broja parametara.
+
+Ako ovo apliciramo na nacin:
+
+              Parcijalna           Povratna vrijednost:          Closure
+              aplikacija                                        
+
+  foo 4           DA            fun b -> fun c = 4 + b + c         DA
+  
+  foo 4 9         DA            fun c = 4 + 9 + c                  DA
+
+  foo 4 9 2       NE!           4 + 9 + 2                          NE!
+              (Potpuna ap)
+  
+
+===============================
+|--> Operatori <--|
+
+
+U F# mozemo izmisljati operatore.
+
+Mogu izmisliti potpuno novi tip, kao npr tip foobariranja.
+
+Kada kreiram tipove moram razmisljati:
+
+  koji mu je prioritet
+
+  koja mu je asocijativnost
+
+
+U F# ne mozemo operatorima dodijeljivati prioritet i asocijativnost.
+
+Postoje pravila po kojima F# implicitno to odredjuje.
+
+
+--------------------------------------
+Razlikujemo binarne i unarne operatore.
+
+Simboli u definiciji operatora su sekvenca sljedećih karaktera: 
+!%&*+-./< = >?@^|~ (defakto, oni koji vec figuriraju u jeziku)
+--------------------------------------
+
+Operator nije nista drugo do lambda!
+
+Ime operatora u definiciji se predstavlja na nacin:
+
+  (nekakva lista onih simbola)
+
+-----------------------------------------------------------
+//PR 
+
+  let foo x y = ...
+
+Ovo nije operator jer foo nije u zagradi
+
+-----------------------------------------------------------
+// PR
+
+  let (.>) x y = ...
+
+Ovo je primjer definicije binarnog operatora
+
+Ovo nije nista drugo do currying funkcija.
+-----------------------------------------------------------
+
+
+
+
+-----------------------------------------------------------
+Prioritet i asocijativnost bi se utvrdjivao na osnovu
+simbola koji se koriste u zagradi pocev od prvog simbola.
+-----------------------------------------------------------
+Pravilo:
+Ako je tacka na listi simbola, njega preskacemo u odredjivanju
+prioriteta i asocijativnosti.
+-----------------------------------------------------------
+
+
+-----------------------------------------------------------
+//PR
+  
+  let (.>) x        Lijeva asocijativnost
+
+Ovo je primjer unarnog operatora.
+-----------------------------------------------------------
+
+
+-----------------------------------------------------------
+Opeator @ je definiran u dotnet standardu i ima veze sa listama.
+Desno je asocijativan i ima vrlo nizak prioritet.
+Upitanju je prioritet nizi od aritmetickih i logickih opreacija.
+-----------------------------------------------------------
+Operator | je lijevo asocijativan i niskog priorita.
+Ima nizi prioritet od svih aritemtickih i vecin logickih
+operatora.
+-----------------------------------------------------------
+
+
+
+-----------------------------------------------------------
+//PR
+let (@<) x y         Desno asocijativan
+-----------------------------------------------------------
+
+
+Predstavimo operator kao slovo 'o'.
+
+Operatori se mogu aplicirati na 2 nacina:
+
+  Prefiks forma:
+    
+    (o) a b            moraju biti zagrade 
+
+    Npr:
+
+    (+) 2 4
+
+  Infiks forma:
+
+    a o b              ne smiju biti zagrade
+
+    Npr:
+
+    2 + 4
+
+
+Moguce je redefinirati postojece operatore i iste koristiti.
+Npr.
+
+let (+) x y = x + y + 1          Sto naravno nema smisla
+
+
+-----------------------------------------------------------
+                   Operator |>            Operator <|
+
+Definicija:     let (|>) v f = f v    let (<|) f v = f v
+                    
+                  v - bilo sta 
+                  f - funkcija
+
+Primjer:             v |> f                  f <| v
+
+Znacenje:             f v                      f v
+
+Asocijativnost:        L                 L (nije dobro)
+
+Prioritet:            Od |                     Od <
+
+Tok:                 L -> D                   L -> D
+
+Forma 
+aplikacije:          infix                    infix
+
+-----------------------------------------------------------
+
+Ovo nam je korisno zbog citljivosti.
+
+Pogledajmo primjer:
+
+  let a = 5 |> foo |> bar
+
+Uzmemo 5 i proslijedimo ga u foo.
+Ono sto foo izracuna i vrati, proslijedimo u bar.
+Ono sto bar vrati je rezultat ovog izraza.
+
+
+Napomena:
+  Razmisljati na nacin da ono sto zadnje figurira u 
+  ovakvom izrazu je ono sto vraca konacnu vrijednost.
+
+
+
+U notaciji bez opeartora |>, bi ovo zapisali:
+
+  let a = bar foo 5
+
+Aplikacija je lijevo asocijativna i visokog prioriteta.
+
+Kompajler bi prvo razmisljao da aplicira bar na foo.
+
+U ovom slucaju nam trebaju zagrade:
+
+  let a = bar (foo 5)
+
+
+/////////////////////////////
+Gdje god vidimo ' u anotaciji, to je kao u C++, geneticki T.
+
+'a -> ('a -> 'b) -> 'b
+/////////////////////////////
+
+
+
+Dodatni primjeri:
+//PR
+
+Sa |>
+
+  let k = 5 |> foo |> bar |> (/) 25
+
+Bez |>
+
+  let k = 25 / (bar (foo 5))
+
+//PR
+
+Razmisljati na nacin:
+
+  let z = 3 + 2 * 5 |> foo
+
+Da svi ovi operatori imaju veci prioritet od |>
+
+
+
+//PR
+
+  let a = bar <| foo <| 5     Greska u kompajliranju
+
+  let a = bar <| (foo <| 5)
+
+
+________________________________________________
+
+|> niže vrijednosti
+
+>> niže funkcije
+
+Definicija operatora >> izgleda:
+
+  let (>>) f g = fun x -> g ( f x )
+
+Vidimo da ova kompozicija trazi jednu vrijednost za pattern
+matching.
+
+Rezultat prve funkcije, postaje ulaz druge...
+
+
+Operator >> pravi novu funkciju koja je kompozicija f pa g.
+
+f >> g    ->    Prvo primjeni f pa na rezultat primjeni g.
+
+
+// PR
+
+  let foo = (*) 5
+
+  let bar = (-) 1
+
+  let tar = (+) 3
+
+  let foobartar = foo >> bar >> tar
+
+  4 - 2 |> foobartar
+
+
+foobartar nije nista drugo do kompozicija funkcija.
+
+Razmisljati na nacin:
+
+  foo >> bar >> tar 
+
+foo >> bar           ->   bar(foo x) 
+
+bar(foo x) >> tar    ->   tar(bar(foo x))
+    
+
+Takodjer:
+
+  a |> b |> c
+
+je isto sto i:
+  
+  a |> (b >> c)
+
+
+// PR
+
+Operator >> zamisliti kao vodovod:
+
+  broj → [ dodaj 5 ] → [ podijeli s 2 ] → [ napiši "KM" ]
+
+tj:
+
+  let transformacija = dodaj5 >> podijeli2 >> formatiraj
+
+
+===============================
+|--> Kontrola toka <--|
+
+Opšti format:
+
+  if expr1 then expr2 else expr3
+
+
+        expr1 mora biti tipa bool
+
+        expr2 i expr3 moraju biti istog tipa
+
+
+               true -> izvrsava se expr2
+              /
+        expr1 
+              \
+               false -> izvrsava se expr3
+
+------------------------------------------
+// PR
+    if true then 2 + 3 else 100
+
+    5
+
+// PR
+    if false then "foo" else 2
+
+    Stopped due to error
+
+------------------------------------------
+
+
+Ukoliko se izostavi else onda kompletan izraz mora vraćati ().
+
+Drugim rijecima ako izostavim else, jedini razlog zasto koristim
+if izraz je zbog popratnih efekata
+
+
+// PR
+    if true then printf "foobar"            if false then printf "foobar"
+
+    foobar                                  ()
+
+// PR
+
+    if true then 2 + 3      
+    
+    Stopped due to error      2 + 3 vraca int, a mora vracati () jer nema else
+
+________________________________________________
+
+Bitan detalj:
+
+U F#, uvijek moras iskoristiti vrijednost koju si dobio nazad.
+
+Ako to ne uradis dobijes warning od kompajlera.
+
+Ali, ako dobijemo unit nazad (kojeg ne iskoristimo) necemo dobiti warning.
+
+
+// PR
+Pogledajmo jedan primjer funkcije ignore, koja ima definiciju:
+
+  let ignore _ = ()
+
+Ja ako dobijem rezultat kojeg ne zelim iskoristiti, ja mogu taj 
+rezultat poslati u ignore funkciju.
+To radim upravo da izbjegnem onaj warning.
+
+Npr.
+
+foo 10 |> ignore
+
+===============================
+|--> Match <--|
+
+Novi nacin kako mozemo forsirati pattern match.
+
+Opšti format:
+
+    match expr with
+    | pat1 -> expr1
+    | pat2 -> expr2
+    ...
+    | patn -> exprn
+
+          
+        expr - proizvodi vrijednost nekog tipa
+              
+               podvrgava se pattern matchingu potencijalno
+               svim patternima, pocev od pat1 pa do patn
+
+               kada matchiranje uspije sa odredjenim pat 
+               izvrsava se pripadni expression
+
+               rezultat pripadnog expression-a je ujedno
+               i rezultat cijelog match izraza
+
+        expr1, expr2, ..., exprn - moraju vracati isti tip
+          
+        non-exhaustive - znaci da nisam pokrio sve moguce 
+           match         slucajeve da bar jedan patern 
+                         match uspije.
+                          
+                         Kompajler daje warning.
+
+                         Runtime daje iznimku.
+
+
+//PR
+    match 2 + 3 with
+    | 2 | 3 | 8 -> "foo"
+    | 5 -> "bar"
+    | _ -> "tar"             _ je tzv fallback
+
+Ako imamo _, onda je nas match exhaustive.
+
+To je iz razloga, sto se _ matcha za bilo koju vrijednost.
+===============================
+|--> function <--|
+
+Sljedece sto cemo vidjeti je jos jedan syntastic suggar.
+
+Metodologija kako mozemo definirati funkciju, da eksplicitno ne imenujemo 
+parametar, i to u formi da kazemo function i idemo sa onim dijelom
+koji vidimo u match expression-u.
+
+function je isto sto i lambda koja uzima x i matcha x sa ovim dole.
+
+------------------------------------------------------------
+  function            je identicno:      fun x -> 
+  | pat1 -> expr1                           match x with
+  | pat2 -> expr2                           | path1 -> expr1
+  ...                                       | path2 -> expr2
+  | patn -> exprn                           ...
+                                            | pathn -> exprn
+------------------------------------------------------------
+
+Ovo definira lambdu koja inkorporira u sebi match izraz.
+
+
+Dakle, kada kazem:
+
+  let foo = function ...
+
+je isto sto imenujemo
+
+  let foo = fun x -> ...
+
+
+foo bi bio funkcija koja uzima x i pattern matcha ga na neki
+pattern.
+
+Samo sto ne egzistira x.
+
+Sta god da uzme, matchat ce se sa nekim patternom.
+
+
+//PR
+    let foo = function 
+      | "foo" -> true
+      | _ -> false
+
+    foo "bar"
+
+  False
+
+Zamislimo da je function x.
+
+x mora biti string, jer je tako implicitno anotiran zbog pat1.
+
+Da bi ispis bio true, mora biti identican kao pat1.
+
+
+    foo "foo"
+  True
+
+===============================
+|--> Match i when <--|
+
+U kopmoziciji match i whena, when se tu naziva guard.
+
+Opšti format:
+
+  match expr with
+  | pat1 when ce1 -> expr1
+  | pat2 when ce2 -> expr2
+  ...
+  | patn when cen -> exprn
+
+        ce1, ce2, ... cen - dodatni uslovi koji se moraju ispuniti 
+                            da bi se izvrsio pripadni expr podudarenog
+                            uzorka
+
+                            moraju vratiti vrijednost tipa bool
+
+
+Ovo ce biti najcesci nacin kako buisness logiku implementiramo.
+
+ifova ce vrlo rijetko bit, a match cemo vrlo cesto koristiti.
+
+
+
+Jos nam nedostaje da naucimo kako da se ponavljamo u kodu.
+
+for i while ne egzistiraju kao takvi u F#.
+
+Kao rjesenje koristimo rekurzivne funkcije.
+
+===============================
+|--> Rekurzivne funkcije <--|
+
+Ako u definiciji funkcije stavimo kljucnu rijec rec, onda tu istu
+funkciju je moguće aplicirati unutar izraz kojim se definira funkcija:
+
+  Format:
+  let rec fname pat = expr
+
+Naravno ovdje moze biti niz patterna, pat1, pat2, ...
+
+Drugim rijecma, ako postoji kljucna rijec rec, onda fname mogu koristiti
+unutar ovog expr.
+
+==================================
+|--> Tail rekurzivne fnukcije <--|
+
+
+Ukoliko se unutar definicije rekurzivne funkcija njena aplikacija 
+ne komponuje u kompleksniji izraz, za funkciju kažemo da je tail rekurzivna.
+
+tail rekurzivne funkcije kompajler može značajno optimizirati.
+
+
+Dakle, ako apliciram rekurizvnu funkciju i komponujem je u nekom izrazu,
+onda ona nije tail rekurzivna.
+
+
+
+Tail rekurzivnu funkciju je komplikovano napisati.
+
+U FP non-tail rekurzivne funkcije se nazivaju naivnim implementacijama.
+
+
+tail rekurzivna varijanta moze biti nekoliko magnitude brza od one 
+koja nije tail rekurzivna.
+
+
+Ne postoji algoritam da se od non-tail rekurzivne napravi tail
+rekurzivna funkcija.
+
+
+
+
+
+

@@ -15,8 +15,8 @@
 (* printfn "%d" x *)
 
 
-let (a, b, c) = (26, 28, 18)
-let x = a &&& b &&& c
+let ((a:float32), b, c) = (26f, 28f, 18f)
+let x = int a &&& int b &&& int c
 printfn "%d" x
 
 

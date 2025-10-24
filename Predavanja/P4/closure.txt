@@ -56,7 +56,7 @@ Lambda
 
                       bindian simbol  
                   /                   \
-Aplikacija lambde         tokom         => lambad je closure
+Aplikacija lambde         tokom         => lambda je closure
                   \                   / 
                      kreiranje lambde
 

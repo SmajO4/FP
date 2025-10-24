@@ -2,9 +2,9 @@ Zelimo izmisliti alternativnu algebru za tipove koje mi izmislimo.
 
 C++ je od prvih oopj u kojem je moguce definirati operatore.
 U C++ ne mozemo izmisljati novi operator.
-U F# mozemo izmisljati tipove, ali ne mozemo mu dodjeljivati prioritet i 
+U F# mozemo izmisljati operatore, ali ne mozemo mu dodjeljivati prioritet i 
 asocijativnost.
-U Haskelu mozemo izmisljati tipove i cak eksplicitno reci koji prioritet i 
+U Haskelu mozemo izmisljati opreatore i cak eksplicitno reci koji prioritet i 
 asocijativnost taj operator moze imati.
 
 U C# i Javi originalno nismo mogli definirati operatore.

@@ -15,6 +15,15 @@ let makeDerivative (dx: float) (f: float -> float) : (float -> float) =
     (f (x + dx) - f (x)) / dx
   f'
 
+
+(*
+let makeDerivative (dx: float) (f: float -> float) : (float -> float) = 
+  let f' = fun x -> 
+    (f (x + dx) - f (x)) / dx
+  f'
+*)
+
+
 // iz makeDerivative cemo vratiti funkciju
 
 

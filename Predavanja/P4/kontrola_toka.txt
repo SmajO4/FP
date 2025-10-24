@@ -13,7 +13,7 @@ if expr1 then expr2 else expr3
         u suprotnom, kompletan izraz vraća rezultat izvršenja expr3
 
 
-expr1 vraca vrijednost onog tipa koju vrati expr 2 ili expr3.
+izraz vraca vrijednost onog tipa koju vrati expr 2 ili expr3.
 
 Zakljucujemo da expr2 i expr3 moraju biti istog tipa.
 

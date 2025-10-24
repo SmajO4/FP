@@ -17,7 +17,7 @@ Sljedeca stvar koja je aplikabilna samo na fp i ni nasta drugo:
 
 ---------------------------------------------------------
 |--> Currying <--|
-
+  
   Tehnika (tzv syntastic sugar) kojom se funkcija koja po definiciji
   izgleda kao da uzima vise argumenata, transformise u sekvencu 
   funkcija viseg reda koje uzimaju i vracaju tacno jednu vrijednost.

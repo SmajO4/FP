@@ -44,6 +44,7 @@ Sta god da uzme, matchat ce se.
   foo "bar"
 False
 
+
 Vidimo da smo definirali lambdu koja uzima x i pattern matcha ga na foo.
 x mora biti tipa string.
 
