@@ -1,0 +1,98 @@
+p1.fsx
+  currying je proces u kojem se od funkcije koja ima vise argumenata 
+  napravi familija funkcija gdje svaka funkcija ima jedan argument i 
+  nazad vraca jednu vrijednost.
+
+  Od funkcije between:
+    let between lo hi x =
+
+  se napravi 3 funkcije, gdje svaka uzima jedan argument i nazad vraca jedan argument.
+    let between lo = fun hi -> fun x = 
+
+  Samim time nam to daje mogucnost da radimo parcijalnu integraciju.
+
+  between, funkcija int -> int -> int -> bool  
+  isWorkingClass, funkcija int -> bool
+  
+  Da sam aplicirao samo 22 
+  isWorkingClass, int -> int -> bool
+
+--------------------------------------------------------------------------------------
+  Ovo ovdje:
+    let ages = [ 12; 18; 25; 130; 67; 0 ]
+
+  S desne strane je pattern za listu.
+
+  Ako zelimo da imamo pattern za vektor:
+    let ages = [| |]
+
+  Ako je nesto pattern -> to znaci da ga mozemo koristiti u pattern matchiranju.
+  
+--------------------------------------------------------------------------------------
+  Ovo ovdje:
+
+    let workingClasses = ages |> List.filter isWorkingClass
+
+  Redoslijed prioriteta.
+    List.filter isWorkingClass
+    
+    Ovo je aplikacija funkcije.
+
+    isWorkingClass je funkcija, a filter kao prvi argument mora uzeti funkciju.
+
+    Mora vratiti nazad funkciju koja uzima listu i vraca nazad opet listu.
+
+    Ovo radi da filtriramo elemente liste na nacin da ostanu samo oni koji zadovoljavaju isWorkingClass
+--------------------------------------------------------------------------------------
+    |> - forward pipe je operator za aplikaciju
+
+--------------------------------------------------------------------------------------
+p2.fsx
+
+    let studentDiscount = discount 15
+
+  Ovaj kod se kompajlira cak i kada stavimo 15.
+
+  Kompajler ce 15 definirati kao float.
+  Type inference kompajler u opstem slucaju koristi na osnovu konteksta koristenja konstante.
+
+--------------------------------------------------------------------------------------
+p3.fsx
+
+  Zamijenimo mjesta x i y da dobijemo 30
+
+  Pozicija argumenata za nase funkcije je ekstremno bitna ako zelimo da funkcija ucestvuje 
+  u bilo kakvom pipelineu.
+
+    let workingClasses = ages |> List.filter isWorkingClass
+
+  Ako se vratimo na ovo, postoji ogroman razlog zasto filter uzima predicate kao prvu funkciju.
+
+--------------------------------------------------------------------------------------
+  Sta map uzima?
+
+    let discounted = prices |> List.map studentDiscount
+
+  Uzima funkciju i listu, a vraca novu listu, gdje su elementi transformirani koristeci datu funkciju.
+  Nad svakim elementom pozove tu funkciju, dobije novu vrijednost od koje pravi novu mapu.
+
+  map je funkcija viseg reda.
+
+  <| je beskoristan.
+
+  Koristan je nekada kada zelimo biti fency i ne zelimo pisati zagrade.
+
+    let y = 7
+    // ?
+
+
+--------------------------------------------------------------------------------------
+p4.fsx
+
+--------------------------------------------------------------------------------------
+p5.fsx
+
+--------------------------------------------------------------------------------------
+p6.fsx
+
+  Za grananje u F# mozemo koristiti if then else ili match 
