@@ -16,7 +16,7 @@
 
 
 let ((a:float32), b, c) = (26f, 28f, 18f)
-let x = int a &&& int b &&& int c
+let x : int = int a &&& int b &&& int c
 printfn "%d" x
 
 

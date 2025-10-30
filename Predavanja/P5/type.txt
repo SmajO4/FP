@@ -1,0 +1,88 @@
+======================================
+|--> type <--|
+
+Vidjet cemo da svaki put kada uvedemo neki koncept za pravljenje novih 
+tipova, naucit cemo i novi pattern.
+
+|------------------------------------|
+  Pomocu kljucne rijeci type se kreiraju novi tipovi.
+
+  Pored primitivnih tipova i .NET klasa, F# podrzava
+  i sljedece funkcionalne tipove:
+
+    * Records (Product type)
+    * Tuple
+    * Descriminated unions (Sum type) 
+    * List
+    * Option 
+|------------------------------------^
+
+List (JLL) i option su varijante sum type-a.
+List ne sluzi samo kao kontejner, vec i za neke druge stvari.
+
+Za sum types-e ne postoji ekvivalent u oop.
+
+Svi ipj nastoje na neki nacin da involviraju u svoj jezik sum typs-e koji
+su izuzetno interesantni.
+Najveci problem je sto ti programski jezici nemaju koncept pattern matchinga.
+
+|------------------------------------|
+  Zajednička karakteristike svih navedenih tipova:
+
+      Podržavaju poređenje i jednakost
+
+      Mogu se ispisivati putem printf i sličnih funkcija.
+|------------------------------------^
+
+Ovo nije slucaj u C++.
+
+
+Po defaultu se svi tipovi mogu ispisivati na standardnom izlazu.
+
+Ispitivanje, da li se tip vrijednosti podudara sa formatom navedenim
+u "" kod printf funkcije se dogadja u compile time-u.
+
+Ovo nije slucaj za C.
+
+
+
+Postoji i posebni foramt "%A" ili "%O" kojim mozemo isprintati bilo sta.
+
+Postoji metodologija kako se printaju primitivni tipovi u F#.
+
+
+======================================
+|--> Alias <--|
+
+Prmo metodologija upotrebe kljucne rijeci type.
+
+|------------------------------------|
+  Drugo ime za vec postojeci tip je moguce dati u 
+  formatu:
+
+    type novo_ime = postojeci_tip                Ekvivalent u C (i C++) je typedef (i using)
+
+  Kompajler ne pravi distinkciju izmedju novog i postojeceg tipa.
+  
+|------------------------------------^
+
+//PR
+
+  type foo = int 
+  let z : foo = 5
+
+  let p : int = z
+  z
+
+5
+\\
+
+
+Invarijante (zastitu) zelimo postaviti u kodu i inforsirati ih sto prije.
+
+Idealno je to raditi u procesu kompajliranja.
+
+Npr. ne mozemo setovati string na broj, ne mozemo reci std::string a = 5
+Ova invarijanta se inforsira u compile time-u.
+
+======================================

@@ -4,10 +4,10 @@
 
 
 
-let add x y = (+) y x
-let mul x y = (*) y x
-let sub x y = (-) y x
-let div x y = (/) y x
+let add x y = (+) x y 
+let mul x y = (*) x y
+let sub x y = (-) x y
+let div x y = (/) x y
 
 let start = 11
 let result = start |> add 5 |> mul 4 |> sub 3 |> div 2 

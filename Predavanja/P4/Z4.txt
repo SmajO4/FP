@@ -288,6 +288,8 @@ aplikacije:          infix                    infix
 
 -----------------------------------------------------------
 
+Operator |> u F# znači "proslijedi rezultat lijevo kao posljednji argument funkciji desno".
+
 Ovo nam je korisno zbog citljivosti.
 
 Pogledajmo primjer:

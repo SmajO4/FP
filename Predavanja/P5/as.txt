@@ -1,0 +1,103 @@
+======================================
+|--> as uzorak <--|
+
+Ide u kompoziciji sa jos jednim uzorkom.
+
+as uzorak ima format:
+
+  postojeci_uzorak as ime_simbola
+
+|------------------------------------|
+  Format za uzorak je:
+    
+    pat1 as var1
+
+  Gdje:
+    
+    pat1 predstavlja neki uzorak
+    var1 je varijabla
+
+  Ukoliko se pat1 podudari sa vrijednoscu, varijable var1 ce se zavezati
+  za kompletnu vrijednost i moći će se koristiti u izrazu koji figurira 
+  nakon procesa podudaranja.
+
+|------------------------------------^
+
+Dakle imam nekakav uzorak koji ce pattern matchat nesto, a onda mogu
+dodati as i onda ime simbola.
+
+Ako pat1 matcha sa vrijednosti na koju se matcha, ovaj pattern ima u 
+sebi simbole koji ce se bindidati na kompletnu vrijednost sa kojom se 
+matchao ili dijelovima te vrijednosti. To je ok to nas ne zanima.
+
+Ali barem jedan ce se uvijek bindiati za kompletnu vrijednost, kao 
+ID pattern.
+
+
+
+Jos jednom:
+Imam pat1, koji ce se matchati sa necim.
+
+On u sebi moze imati simbole koji ce izvaditi komadice iz vrijednosti.
+Kao npr ime i grad.
+
+Ja prezentiram studenta i ovaj pat1 izvadi ime i grad iz studenta.
+
+Ali ako stavim as s1, s1 ce se bindiati za cijelog studenta.
+Tako da cu imati i taj simbol u korespondirajucem kodu koji slijedi
+nakon pattern matcha.
+
+--------------------------------------
+
+//PR 
+  let foo ((a,b) as c) = (a, b, c)
+\\
+
+foo je simbol koji je bindian za lambdu.
+
+
+Ovo:
+  ((a,b) as c)
+je as pattern
+
+Unutar as pattern se sastoji od 
+patterna i bindinga.
+
+Pattern koji je koristen je tuple.
+
+Uzimam tuple od 2 elementa, a i b, cije tipove ne znamo.
+
+Ali mozemo zakljuciti o tipu a i b na drugoj strani.
+
+Kada pozovemo funkciju sa tuple-om, nazad dobijemo tuple.
+
+Onaj ko je bio prvi u tuple-u sa kojim smo pozvali ce biti 
+prvi u novom tuple-u kojeg dobijemo nazad.
+Drugi koji je bio u tuple-u ce biti drugi kojeg dobijemo nazad.
+
+a i b mogu biti bilo kog tipa, pri cemu vrijednosti ne moraju
+biti istog tipa.
+
+Nazad vracamo tuple tipa od onog sto je a bio, tipa od onog 
+sto je b, i vracamo c.
+c je simbol koji je bindian za tuple od a i b.
+
+
+Dakle nazad vracamo tuple od sta god je a, sta god je od b,
+i unutra tuple od a, b.
+ 
+
+//PR kod aplikacije
+
+  foo (3, "foo") |> printfn "%A"
+(3, "foo", (3, "foo"))
+
+Razmislimo na ovaj nacin:
+
+  let foo ((a : a' ,b : b') as c : (a', b')) = (a, b, c)
+
+======================================
+
+Ulazimo se u dio koji se tice sum typs-a.
+
+

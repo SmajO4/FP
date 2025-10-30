@@ -115,6 +115,15 @@ Ako nije, baciti iznimku.
 *)
 #endif
 
+let isEvenOrThrow (x : int) : bool =
+    match x % 2 with
+    | 0 ->
+        printfn "broj je paran"
+        true
+    | _ ->
+        failwith "broj nije paran"
+
+#endif
 
 // ============================================
 
@@ -128,16 +137,9 @@ Inače vratiti sqrt x.
 Sve anotirati tipovima.
 *)
 
-let isEvenOrThrow (x : int) : bool =
-    match x % 2 with
-    | 0 ->
-        printfn "broj je paran"
-        true
-    | _ ->
-        failwith "broj nije paran"
-
-#endif
-
+let safeSqrt (x : float) : float =
+    if x < 0.0 then failwith "Negativan broj!"
+    else sqrt x
 
 // ============================================
 
@@ -152,9 +154,14 @@ i izračunate add10 5.
 *)
 #endif
 
-let safeSqrt (x : float) : float =
-    if x < 0.0 then failwith "Negativan broj!"
-    else sqrt x
+let makeAdder (a:int) : int -> int = 
+  fun (b:int) : int = a + b
+
+let add10 : int -> int = makeAdder 10
+let ex7   : int = add10 5
+printfn "add10 5 = %d" ex7
+printfn ""
+
 
 
 

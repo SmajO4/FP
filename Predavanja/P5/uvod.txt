@@ -1,0 +1,49 @@
+Svaki tip se zna konvertovati u string i prezentirati na ekranu.
+"%A" je default format
+
+
+U bilo kojem programskom jeziku moramo imati mogucnost proizvodnje tipova,
+da bi taj jezik uopste bio koristan.
+
+Kreiranje tipova -> apstrakcije
+                 -> modeliranje problema u programiranju
+
+U ipj, klase su nacin kako pravimo nove tipove.
+U fp, nemamo klase, pa mora biti nacin kako mozemo praviti tipove.
+
+
+U fp imamo vise metodologija kako mozemo pristupiti problemu kreiranja novih tipova.
+
+
+Obicno se taj pristup dijeli u 2 koncepta (uz koristenje odg kljucnih rijeci):
+  
+  sum types
+
+  product types
+
+Postoji jedan smjer koji ide ka kreiranju generickih tipova.
+
+
+U F# kljucna rijec type se koristi za kreiranje bilo kakvog novog tipa.
+
+tuple je jedna varijanta sum type-a.
+
+U oop, klase bi spadale u prodct type.
+
+U C-u postoji koncept koji se zove junior i daje naznake koji lici na sum type (sto nije korisno).
+
+
+
+C++ jezik ima dva dijalekta: 
+  
+  compile time - aktivira se kada kompajlira kod
+
+    striktno funkcionalnog karaktera
+    
+
+  runtime - izvrsava se kada se program izvrsava
+    
+    striktno imperativnog karaktera
+
+
+Odredjene stvari koje su u runtime-u mozemo simulirati u runtime-u.

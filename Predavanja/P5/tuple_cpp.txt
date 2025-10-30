@@ -1,0 +1,120 @@
+Postoji trend da svaki ipj dobija feature koji egzistiraju u fp.
+
+Npr ako kazemo sljedece:
+
+------------------------------------
+    #include <tuple>
+
+    auto foo = std::make_tuple(5, 2.5);
+------------------------------------
+
+foo je tipa tuple, od int i double
+
+Uradjeno je compile time programiranje.
+
+
+Ne samo da u C++ mozemo raditi izvrsavanje nekakvih funkcija.
+
+
+
+Pogledajmo primjer funkcije koje mozemo pozvati u compile time-u.
+
+Ako kazemo:
+
+------------------------------------
+  constexpr int foo (int a, int b) {
+    return a * b;
+  }
+------------------------------------
+
+Razlika izmedju constexrp i obicne funkcije.
+
+Ovo kompajleru kaze da moze pozivati funkciju dok se kod kompajlira.
+
+Konkretna posljedica je kada napisemo sljedecu stvar:
+
+------------------------------------
+  auto z = foo (5, 4);
+------------------------------------
+
+Znamo da ce z biti jednako 20.
+
+
+Postavlja se pitanje kako ce kod izgledati na nivou masinca.
+
+Na nivou masinca, 2 su nacina kako ovaj kod izgleda.
+
+Jedan nacin je da kreiramo globalnu varijablu, kao globalan simbol,
+a to ide .global z : .long
+
+
+Kompajler ce uraditi, tj reci ce da prije izvrsavanja main-a, loadat
+ce se ono sto bude rezultat od call foo (5,4)
+
+Rekli smo da prije izvrsavanja mog maina, globalne varijable se 
+moraju inicijalizirati.
+To je zadatak runtime-a.
+
+C++ runtime garantuje da ce svaka varijabla koja je globalna dobiti
+svoju inicijalnu vrijednost.
+
+Dakle nece se u normalnim uslovima pokrenuti od maina, nego od onih
+funkcija koje sluze da se inicijaliziraju globalne varijable u 
+odgovarajucem redoslijedu.
+
+
+Dakle ako imam:
+
+------------------------------------
+ int foo (int a, int b) {
+    return a * b;
+
+  auto z = foo (5, 4);
+
+  int main() {
+    2 + 3;
+  }
+------------------------------------
+
+ovo se transformira u kod, da ce asembler odvojiti prostor za z 
+u data sekciji, a runtime ce namjestiti da program pozove foo prije nego 
+sto se pokrene main sa 5 i 4 i rezultat koji dobijemo od poziva ce 
+snimiti u z.
+
+Onda ce se pozvati nas main.
+
+
+Ali obratiti paznju, da rezultat od foo-a vec mozemo izracunati dok 
+se kod kompajlira i ne moram cekati da se program pokrene.
+
+Bezveze ce se izvrsavati ovaj kod, svaki put kada se program pokrece.
+
+Npr za embeded kod je ovo suvisno.
+
+
+Ako stavimo ovo:
+------------------------------------
+ constexpr int foo (int a, int b) {
+    return a * b;
+
+  auto z = foo (5, 4);
+
+  int main() {
+    2 + 3;
+  }
+------------------------------------
+Sad sam oznacio da funkcija moze biti pozvana ili u runtime-u ili compiletime-u.
+
+Nigdje nece biti call foo u runtime-u.
+
+Bukvalno bi imali u asembleru:
+.section .data 
+.global z : .long 20
+
+
+
+
+
+
+
+

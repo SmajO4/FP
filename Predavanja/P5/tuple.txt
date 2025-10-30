@@ -1,0 +1,267 @@
+======================================
+|--> Tuple <--|
+
+U C++ standarndoj biblioteci je sve ovo implementirano.
+
+#include <tuple> - imam tuple u C++
+
+|------------------------------------|
+  Tuple je tip, agregiran od neimenovanih clanova (polja) bilo kog F# tipa, 
+  cije ime je u formatu:
+
+    tip1 * tip2 * ... * tipn
+
+    Gdje:
+        tip1, tip2, ...,tipn - predstavljaju tipove od pojedinacnih 
+                               agregiranih clanova
+|------------------------------------^
+
+
+tuple kao koncept je familija tipova koji su agregirani od drugih tipova.
+
+Svaki individualno je zasebni tip.
+
+Dakle tuple je skup tipova.
+
+--------------------------------------------
+|--> Razlika izmedju Record-a i Tuple-a <--|
+ 
+U Record-u, clanovi imaju ime.
+
+U Tuple-u, clanovi nemaju ime.
+
+
+Tuple spada u kategoriju record typs-a, samo u kojim record polja 
+nemaju imena.
+
+Tuple je ekvivalent stucta u C++, gdje polja nemaju ime.
+
+
+Kako dolaziti do pojedinacnih polja?
+- U fp obicno pattern matching-om.
+
+Koji pattern da koristimo?
+- Pa tupple pattern o kojem cemo govoriti.
+
+Kako u C++ dolazimo do polja, a znamo da nemamo pattern matchinga?
+- Jedini metod je da koristimo indexiranje.
+Polja nemaju ime, ali imaju redoslijed.
+
+
+-------------------------------------------------
+|--> Razumijevanje sta predstavlja agregacija<--|
+
+
+Tuple je agregacija vise tipova.
+
+Record je agregacija vise tipova.
+
+Funkcija je agregacija vise tipova - konkretno 2 tipa.
+
+Mozemo reci da je funkcija verzija recorda.
+
+Ako funkcije ne proizvode popratne efekte - funkcija je agregacija 2 tipa.
+
+Razmisljamo, prva je ona koju dam kao input, a druga je ona koja mi se vrati nazad.
+
+
+Ako ja jednom pozovem funckiju koja ne proizvodi popratni efekat i dobijem 
+nazad rezultat efektivno imam record koji reprezentira vrijednost te funkcije
+u konkretnom slucaju.
+Ako funkciju pozovem sa svim mogucim unosima, dobijaju se sve moguce kombinacije
+ta 2 para - to je record, od 2 elementa.
+
+Tuple je efektivno record koji ne imenuje clanove.
+
+
+
+Dakle, funkcija je agregacija 2 tipa, ili tuple od 2 tipa, ako funkcija ne 
+proizvodi popratne efekte.
+
+Ili bolje receno, funkcija je tuple ili record u kojem vrijednost prvog znamo
+a vrijednost drugog mozemo izracunati u bilo kom trenutku.
+
+
+Funkciju zapisujemo:
+  tip1 -> tip2
+
+Zapis za nesto sto agregira vise tipova:
+  tip1 * tip2 * ... * tipn      // bukvalno product, cita se product
+
+
+------------------------------------------
+|--> Kreiranje vrijednosti tipa tuple <--|
+
+Isto kao record samo u (neobaveznim) malim zagradama.
+
+To radimo pomocu izraza:
+  
+  (v1, v2, v3, ..., vn)         // jedna stvar, druga stvar, ...
+                                // tipa jedan, tipa dva, ...
+
+Zapravo, zagrade stavljamo zbog cinjenice da , ima nizak prioritet.
+Najcesce trebaju kada se tuple pojavljuje u aplikacijama.
+
+Ako kazemo:
+
+  v1, v2 x 
+
+Ovo znaci aplikacija!
+Apliciraj v2 na x.
+
+
+Kontekst koda ti nalaze da vr. tuple-a stavis u zagradu.
+
+
+Pogledajmo primjer gdje ne treba zagrada:
+
+//PR
+      let foo = 2, 3.5, "test"
+      let bar : int * float * string = foo
+
+      type Foo = int * float * string
+
+      let tar : Foo = bar
+      tar
+
+(2, 3.5, test)
+Item1	
+2
+Item2	
+3.5
+Item3	
+test
+\\
+
+Tip od foo je int * float * string
+
+Ok je reci 
+  let bar : int * float * string = foo
+
+jer je kompajler zakljucio tip za foo
+  
+Ovo je alias, tj foo je alias od svih mogucih varijanti tipova koji
+su tuple-ovi.
+foo je toople u kojem je prvi int, drugi float, treci string.
+
+//
+  (2, 3.5, test)
+Item1	2
+Item2	3.5
+Item3	test
+\\
+
+------------------------------------------
+|--> tuple uzorak <--|
+
+|------------------------------------|
+  Format za uzorak je:
+
+    (pat1, pat2, ..., patn) 
+
+      Gdje je pat1, pat2, ... patn - uzorak
+
+
+  Podudarit ce se sa vrijednosti odgovarajucet tuple tipa pod uslovom da se
+  podudare svi uzorci: pat1, pat2, ..., patn aplicirani na pojedinacnim 
+  clanovima Tuple-a.
+|------------------------------------^
+
+Zagrada je ponovo opciona. Ali uglavnom treba.
+
+Podudaranje zahtijeva da se pojedinacni patterni podudaraju.
+
+
+//PR
+    let foo x = 
+      match x with 
+      | (2, _, t) -> t
+      | (_, m, _) -> m
+
+    foo (2, (8, 5), (3, 2)) |> printf "%A"
+(3, 2)
+\\
+
+Ako x ima vrijednost gdje je prvi 2, drugi koji me ne interesuje, a treci bilo sta,
+vrati treci
+
+Prvi match ne uspijeva, ako prvi nije 2.
+
+Ako prvi nije 2, onda uzmi m i vrati m.
+
+
+Vidimo da ovo mozemo aplicirati na ovaj nacin.
+
+"%A" - isprintaj u bilo kom formatu.
+
+
+
+Posmatrajmo ovo:
+
+    foo (2, (8, 5), (3, 2)) |> printf "%A"
+
+Zagradu moramo staviti zbog aplikacije, jer foo 2 ima veci
+prioritet od zareza.
+
+U vecini slucajeva, kada budemo pravili vrijednost tipa tuple, moramo je staviti u 
+zagradu i onda se aplicira ono pravilo prioriteta o kojem smo govorili, gdje 
+zagrada diktira sta prvo kompajler gleda da bi zakljucio, sta je to nesto.
+
+Ovo sto je u zagradi je tipa 
+  int * (int * int) * (int * int)
+
+
+
+Posmatrajmo sada ovo:
+
+    let foo x = 
+      match x with 
+      | (2, _, t) -> t
+      | (_, m, _) -> m
+
+x matchamo na tuple.
+
+Kompajler je zakljucio gdje x mora biti tuple, gdje je prvi u tuple-u int,
+drugi moze biti bilo sta (_ i m se bindaju sa bilo cim, apsolutno bilo kog tipa), 
+treci moze biti bilo sta.
+
+Dakle x je tipa tuple, int * 'a * 'a
+
+foo vraca vrijednost kojeg god je tipa t ili m.
+
+VRLO VAZNO:
+t i m u ovom slucaju moraju biti istog tipa.
+
+//
+  foo (2, (8, 5), "foo")
+
+Stopped due to error
+input.fsx (1,17)-(1,22) typecheck error This expression was expected to have type
+
+    'int * int'    
+
+but here has type
+
+    'string'      
+\\
+
+drugi i treci u tuple-u moraju imati isti tip.
+
+
+TAKODJER VRLO BITNO:
+Zaboravimo onu cinjenicu da jedna aplikacija odredi tipove za prethodno genericku
+funkciju (konkretno funckiju za koju kompajler u njenoj definiciji nije mogao 
+zakljuciti tipove), te da drugom aplikacijom ne smijemo koristiti druge tipove.
+
+To sa nase tacke gledista jedino vrijedi kada u izrazu funkcije figurira +.
+To je specijalan slucaj!
+Iskljcivo + i nas nista vise ne interesuje
+
+U sustini ovo je poprilicno nebitno pravilo.
+
+Konkretno mogli smo ponovo pozvati ovu funkciju na nacin:
+
+  foo (2, "bar", "foo")
+
+======================================
+

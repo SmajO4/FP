@@ -9,7 +9,7 @@ p1.fsx
   se napravi 3 funkcije, gdje svaka uzima jedan argument i nazad vraca jedan argument.
     let between lo = fun hi -> fun x = 
 
-  Samim time nam to daje mogucnost da radimo parcijalnu integraciju.
+  Samim time nam to daje mogucnost da radimo parcijalnu aplikaciju.
 
   between, funkcija int -> int -> int -> bool  
   isWorkingClass, funkcija int -> bool

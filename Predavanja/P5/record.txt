@@ -1,0 +1,406 @@
+======================================
+|--> Record <--|
+
+Record je kljucna rijec pomocu koje mozemo praviti korisnicke tipove koji 
+se klasificiraju kao product types.
+
+|------------------------------------|
+  Record je tip argregiran od imenovanih clanova (polja) bilo kojeg F# tipa,
+  koji se kreira u formatu:
+
+    type ime_tipa =
+      { 
+        clan1 : tip1;
+        clan2 : tip2;
+        ...
+        clann : tipn;
+      }
+
+  Vrijednosti ovog tipa moguce je kreirati dodijeljivanjem vrijednosti za sve
+  clanove unutar {}
+|------------------------------------^
+
+Da bi nesto bilo product type, mora se graditi-pravit-komponovat-agregirat od
+vec postojecih tipova.
+
+Kao sto je i klasa nesto sto se pravi pomocu vec postojecih tipova.
+U klasi mi kazemo od cega ce se sastojiti objekti koji su instance te klase
+- oni ce biti agregirani od polja koji su drugi tipovi.
+
+
+
+type uvijek uvodi novi simbol koji je tip.
+
+Kazemo ime tipa kojeg izmislimo i onda kazemo =, a u viticastim zagradama
+pobrojimo sve ono od cega ce se agregirati objekti ovog tipa.
+
+Ovo je kao struct ili class u C++.
+
+
+//PR
+
+  type Student = { Ime : string; Prezime : string; Godiste: int }
+
+  let foo = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+
+  foo
+
+{ Ime = "Foo"\n  Prezime = "Bar"\n  Godiste = 2003 }
+Ime	Foo
+Prezime	Bar
+Godiste	2003
+
+\\
+
+Svaki student ima polja ime i prezime, koji su tipa string i godiste
+koje je tipa int.
+
+    Redoslijed nije bitan.
+
+    Sve clanove moramo navesti u kreiranju vr. ovog tipa.
+
+Ovo sve ima jako velike slicnosti u C++.
+
+
+Ako u C++ kazemo sljedecu stvar:
+
+//
+  struct foo {
+    std::string ime;
+    int ocjena;
+    int godiste;
+  }
+\\
+
+
+Redoslijed u pisanju (u konstruktoru) determinira sve ovo.
+
+// 
+  Smijem ovo reci:
+  int main() {
+      foo bar = foo(.ime = "tar", .ocjena = 5, .godiste = 1998)    
+  }
+\\ 
+
+chrono, date i timezone su najbolje biblioteke na svijetu.
+One su iz C++.
+Najbolje su za rad sa protokom vremena.
+
+
+
+
+Ako imam 2 razlicita tipa koji imaju isti broj polja i ista imena.
+
+Kako ce kompajler znati, kada instanciram vrijednost jednog ili drugog 
+tipa (bez anotacije) na koji tip mislimo.
+
+|------------------------------------|
+  Ukoliko 2 tipa imaju identicna polja prilikom kreiranja vrijednosti
+  bez eksplicitne anotacije, kompajler ce koristiti tip koji je 
+  posljednje kreiran.
+|------------------------------------^
+
+Ako zelimo kreirati vrijednost prvog tipa, moramo koristiti anotaciju.
+Vidjet cemo 2 verzije.
+
+
+//PR
+
+Pretpostavimo da imamo 2 tipa, koja imaju identican broj polja i imena polja:
+
+    type Student = { Ime : string; Prezime : string; Godiste: int }
+
+    type Profesor = { Ime : string; Prezime : string; Godiste: int }
+
+Ocigledno kompajler mora imati nacin kako ce skontati da li pravimo studenta
+ili profesora.
+
+Medjutim, ako instanciramo vr koja ima polja, ime, prezime i godiste, kompajler
+ce automatski reci da je to profesor, jer smo njega zadnjeg kreirali.
+
+  // foo : Profesor
+  let foo = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+
+Ako zelimo studenta onda anotiramo, a imamo 2 varijante, kako mozemo anotirati:
+
+  // bar : Student
+  let bar : Student = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+
+  // tar : Student 
+  let tar = { Student.Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 } // dovoljno na jednom od polja
+
+--------------------------------------
+
+
+
+U fp, kada napravimo binding, to sto smo bindiali, ostaje konstantno i uvijek
+je zavezan simbol za vrijednost za koju smo ga bindiali.
+
+Da li postoji nesto slicno kao copy constructor, koji ce kopirati sva polja
+u drugu vrijednost - da ima, to je novo bindianje (nije ispravno reci to je 
+a = b, jer je to poredjenje).
+
+|------------------------------------|
+  Moguće je kreiranje nove vrijednosti istog tipa uz opcionu promjenu 
+  vrijednosti određenih polja nakon ključne riječi with unutar {}.
+
+  Poljima unutar vrijednosti je moguće pristupiti putem operatora .
+|------------------------------------^
+
+Kada kazemo:
+
+  type Student = { Ime : string; Prezime : string; Godiste: int }
+  let a = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+  let b = a 
+
+Kreirali smo vrijednost koja je Student, gdje smo a bindiali za tu vr.
+
+Razmisljamo da je b kopija ovog studenta, ali to nije slucaj u runtime-u.
+
+a i b su vezani za jednu vrijednost.
+To je safe uraditi jer nema mutacije.
+
+U C++, bi morali praviti kopiju studenta.
+
+Razmisljati da su a i b imena za stvari koja nece mijenjati svoje vr.
+
+
+Mozemo reci ovako:
+
+  type Student = { Ime : string; Prezime : string; Godiste: int }
+  let a = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+  let b = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+
+Sada imamo dva simbola, vezana za dvije razlicite vrijednosti.
+
+
+|------------------------------------|
+  Moguce je kreiranje nove vrijednosti istog tipa uz opcionu promjenu
+  vrijednosti odredjenih polja nakon kljucne rijeci with unutar {}.
+ 
+  Poljima unutar vrijednosti je moguce pristupati putem operatora .
+  (Isto kao u C++)
+|------------------------------------^
+
+Iskoristimo ovu cinjenicu i imamo:
+
+//PR
+    type Foo = { Ime : String; Godiste : int }
+
+    let foo = { Ime = "Foo"; Godiste = 2005 }
+
+    let bar = { foo with Ime = "Bar" }          // Napravi novu vrijednost koja je kopija
+                                                   od foo, i u toj kopiji promijeni polje ime
+    foo
+
+{ Ime = "Foo"\n  Godiste = 2005 }
+Ime	
+Foo
+Godiste	
+2005
+\\
+
+
+Nacin pristupanja simbolu koji je bindian za neki rekord.
+
+//PR
+    bar.Ime
+Bar
+
+    bar.Godiste
+2005
+
+
+Ako kazemo bar.Ime = nesto
+Ovim radimo poredjenje izmedju polja Ime i neceg.
+
+
+Sada kada znamo sta je Record, mozemo se fokusirati na to sta je 
+Record uzorak.
+
+
+======================================
+|--> Record uzorak <--|
+
+Na mjestu uzorka mozemo koristiti format naveden u nastavku.
+
+|------------------------------------|
+  Format za uzorak je:
+    
+    { p1 = pat1 ; p2 = pat2 ; ...  ; pn = patn }
+
+          Gdje su:
+                  p1, p2, ..., pn - polje
+                  pat1, pat2, ..., patn - uzorak
+
+|------------------------------------^
+
+p1, p2, ..., pn - imena polja od nekog rekorda, na kojem zelim da radimo
+                  pattern match
+
+Automatski ce se ovaj pattern moci aplicirati na stvarima koji su neki
+rekordi, tj tipovi koji su record typs-i.
+
+Onda cu morati pobrojati ona polja, od Recorda na kojem zelim da 
+pattern matcham, koja mene zanimaju.
+
+Ne moram sva.
+
+
+Zelim da kreiram pattern match na vrijednosti koji su instance nekog
+konkretno tipa.
+
+Interesuje me samo pattern match na neka polja i on moze ili ne moze uspjeti.
+
+Mozda me ne interesuje matchiranja za sva polja.
+
+Ja time kazem ime tog polja i dam pattern koji mora odgovarati tipu od tog polja.
+
+
+|------------------------------------|
+  Uzorak ce se podudariti sa vrijednosti, odgovarajuceg Record tipa koje ima 
+  polja: p1, p2, ..., pn, pod uslovom da se svi uzorci: pat1, pat2, ..., patn
+  podudare sa pojedinacnim clanovima vrijednosti sa kojim se vrsi podudaranje.
+
+  Nije neophodno imenovati sva polja u uzorku ukoliko se ista ne koriste 
+  prilikom podudaranja.
+|------------------------------------^
+
+U prijevodu, mogu se samo prezentirati samo one vrijednosti za pattern matching
+koje odgovaraju tipu recorda, koje ima polja p1, p2, ..., pn koje sam koristio
+u uzorku.
+
+Pri cemu ako sam kreirao profesora i studenta, ako sam pattern matchao samo na 
+imenu, u taj pattern match ne mogu slati i studenta i profesora, nego samo onog
+koga je kompajler zadnjeg vidio (ukoliko ja to nisam anotirao).
+
+Takodjer, npr od svih studenata zelim propustiti samo one koji imaju 
+partikularna imena.
+Mene onda interesuje samo ime.
+
+Kada uradim i uspije pattern match, uhvatio sam konkrenog studenta i mogu
+dobiti njegova ostala polja, jer sam dobio refrencu.
+
+
+
+Kada ujedinimo sum typs-e sa product typs-ima dobijemo vrlo bogat vokabular
+da modeliramo svijet.
+Model svijeta kada citas u fpj, je 100% citljiviji, od ipj.
+
+PRAVILO:
+
+tipovi -> definiraju kako je svijet modeliran
+sam kod -> kako svijet radi
+
+tipovi -> sta je svijet
+kod -> kako je svijet
+
+U nastavku cemo vidjeti metodologiju kako modeliramo stvari u fp pomocu
+recorda:
+
+//PR 
+  type Adresa = { Ulica : string; Grad : string }
+
+  type Osoba = { Ime : string; Prezime : string; Adresa : Adresa }
+
+  let foo = { Ime = "Foo"; Prezime = "Bar"; 
+              Adresa = { Ulica = "Tabašnice"; Grad = "Tuzla" }}
+
+  let tar = { Ime = "Tar"; Prezime = "Bar"; 
+              Adresa = { Ulica = "Vase Miskina"; Grad = "Sarajevo" }}
+\\ 
+
+NAPOMENA:
+Sasvim je ok imati isto ime za polje, kao sto je ime tipa.
+
+Dva koncepta su ortogonalna - ne preklapaju se.
+
+Dakle imamo dvije osobe, jedna zivi u Tuzli, druga u Sarajevu.
+
+
+Dalje imamo:
+
+// 
+  let jelCool { Ime = ime; Adresa = { Grad = grad } } =
+      if grad = "Tuzla" then 
+        printfn "bravo %s!!" ime
+        true                                            // Ova varijanta je mocnija od ove ispod
+      else                                              
+        false
+
+  let jelCool1 osoba =                                  // ako smo iperativni programer u ovom trenutku
+      if osoba.Adresa.Grad = "Tuzla" then                  preferiramo ovu varijantu.
+        true 
+      else 
+        false
+\\
+
+Prva verzija radi popratne efekte, dok druga ne.
+Prva verzija proizvodi popratne efekte, zbog printfa.
+Vratit ce bool, ali ce i usput isprintat, ako je grad od onog
+za koga budemo aplicirali, Tuzla.
+
+Ako gledamo kod, vidimo definiciju lambde, tj vr. koji ce se 
+bindiati za lambdu.
+
+Ovo ovdje:
+  { Ime = ime; Adresa = { Grad = grad } }
+je pattern, konkrento record pattern.
+
+Lambda uzima record tipa Osoba.
+
+Dakle jelCool se bind-a za Osobe.
+
+
+Odma od te konkretne osobe izvadimo ime, i od adrese konkretne osobe grad.
+
+Onda mozemo koristiti i ime i grad.
+
+ime i grad su simboli unutar patterna, tipa string.
+
+
+
+
+ime je identifier pattern i to je pat1
+
+{Grad = grad} je pat2
+
+grad je pat3
+
+
+pat1 je na mjestu gdje mora biti uzorak i on je simbol i to je id pattern.
+Ono za sta ce se vezati ovo ime, pa za bilo koje ime koje student ima.
+Efektivno kupimo ime od studenta kojeg dobijemo.
+
+
+{Grad = grad} je record pattern u kojem se nalazi id pattern.
+
+Ovaj pattern sluzi da za studenta kojeg ubacimo u ovu lambdu, da 
+izvadimo njegovo ime i grad.
+I da ona u kodu rezonujemo - ako je grad Tuzla, ispisi "bravo ime"
+
+
+
+
+//
+  jelCool foo
+bravo Foo!!
+True
+
+  jelCool tar
+False
+
+  jelCool tar = jelCool1 tar     // istu stvar rade obje funkcije, obje vrate tacno
+True
+\\
+
+======================================
+|--> <--|
+
+|------------------------------------|
+|------------------------------------^
+
+--------------------------------------
+======================================
+
+

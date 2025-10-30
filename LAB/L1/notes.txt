@@ -79,7 +79,6 @@ Runtime iznimku generisemo kada se pattern ne podudara.
 
 Posmatrajmo sljedeci primjer
 
-
   let concat = fun a b delimiter -> a + delimiter + b
 
 “Imamo simbol concat koji se veže za lambda izraz.

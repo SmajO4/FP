@@ -1,0 +1,447 @@
+======================================
+|--> Descriminated union <--|
+
+Sljedece o cemu cemo pricati su unije.
+
+Unije originalno ne postoje u ipj.
+
+Partikularne su za fp.
+
+Unija je skup sum typs-a.
+
+
+|------------------------------------|
+  Unije prestavljaju tipove čije vrijednosti mogu biti konstruisane 
+  pomoću različitih varijanti konstruktora od kojih svaki može imati 
+  različit broj i tip parametara u formi tuple-a. 
+
+  Format za kreiranje:
+      type ime_time = 
+        | c1 of p1 : t1 * p2 : t2;
+        | c2 of p3 : t3 * p4 : t4 * p5 : t5;
+        | ...
+        | cn of pm | tm * pm;
+
+        Gdje su:
+
+            c1, c2, ..., cn - imena konstruktora
+            p1, p2, ..., pm - imena parametara za konstruktore (opciono)
+            t1, t2, ..., tm - tipovi parametara za konstruktore 
+                              (obavezno ukoliko u definiciji figurira of)
+|------------------------------------^
+
+Konstruktor - FUNKCIJA! koja uzme nesto -> proizvede nesto.
+
+Unija je tip koji mozemo konstruisati na vise nacina - ima vise 
+konstruktora.
+
+To nesto sto proizvodimo novo, je vrijednost tog novog tipa kojeg
+pravimo, pomocu tog konkretno konstruktora.
+
+Konstruktor uzima bilo koji tip, ili tuple.
+
+Konstruktora po definiciji unije kao tipa, mogu imati koliko ih 
+navedem, koji su konstruktori kojima dam ime.
+
+
+Kada konstruisemo vrijednost pomocu konstruktora od unije,
+runtime i kompajler zapamte, cime sam konstruisao tu vrijednost.
+
+U C++ po defaultu, kada kreiram klasu, ja mogu navesti konstruktore
+kojim mogu kreirati objekte te klase.
+Svi konstruktori se zovu istim imenom.
+
+
+Ovdje se konstruktori nazivaju razlicitim imenima (tj to je mogucnost).
+
+Svaki od konstruktora moze da uzima razlicite tipove, ali moramo reci
+kojeg tipa ce uzeti kojeg konstruktore.
+
+*Obicno* forma za konstruktore su tuplovi.
+
+
+Posmatrajmo genericki format za specifikaciju unije:
+
+      type ime_time = 
+        | c1 of p1 : t1 * p2 : t2;
+        | c2 of p3 : t3 * p4 : t4 * p5 : t5;
+        | ...
+        | cn of pm | tm * pm;
+
+type, ime tipa kojeg pravim, a onda slijedi lista pipe odvojenih 
+specifikacija.
+
+Ime konstruktora, kljucna rijec of i ovo je sada tuple.
+
+
+BITNO:
+
+Razlika u odnosu na normalan tuple, je ta sto ovdje mozemo imenovati
+polja od tuple.
+Mozemo ali i ne moramo!
+
+Mogli smo ovdje:
+  | c1 of p1 : t1 * p2 : t2;
+
+na ovaj nacin:
+  | c1 of t1 * t2
+
+Imena su opciona, tipovi su obavezni.
+
+
+Naravno ovdje ne mora biti tuple naravno, vec moze biti neki drugi tip 
+kao npr:
+  of int, of float, of double, of record...
+
+Ali u praksi se obicno stavlja tuple.
+
+
+
+Sto se tice of, to je opciono, ako konstruktor ne uzima nista, pri 
+kreiranju tog neceg novog.
+
+Onda konstruktor ne predstavlja funkciju, vec efektivno kao simbol
+koji reprezentira jednu vrijedonst tog tipa.
+
+Dakle u opstem slucaju, je ovo c1 ime funkcije koja uzme ovo da bi 
+proizvela ovo.
+
+
+Jos jednom, ako konstruktor ne uzima nista, onda nije funkcija, vec 
+je simbol koji predstavlja jedan element tog tipa.
+
+
+Ovo lici na enum iz C-a ili C++
+
+//PR 
+  type Foo = | Jedan | Dva
+
+  let t : Foo = Jedan
+
+  Dva = t
+False
+// 
+
+Ovaj prvi | je opcion.
+
+Vidimo da nemamo of.
+
+Jedan i Dva jesu funkcije koje su konstruktori u opstem slucaju, ali
+ako fali of, onda nije konstruktor, vec je to jedan element tog tipa.
+
+Tip Foo ima 2 elementa u skupu Foo: Jedan i Dva.
+
+
+Vidimo da mozemo reci:
+
+  let t : Foo = Jedan
+
+t tip je Foo
+
+  Dva = t 
+
+je poredjenje.
+
+
+Dakle u ovoj varijanti, Jedan i Dva su vrijednosti tipa Foo.
+
+
+Ako su konstruktori, onda moramo pozvati funkciju koja ce proizvesti 
+vrijednost tog tipa i onda broj vrijednosti tog tipa je potencijalno
+beskonacan u toj varijanti.
+
+
+//PR 
+      type Bar = 
+          | Jedan of c1 : bool * c2 : string 
+          | Dva of c1: int * c2: float * c3:string
+
+      Jedan (true, "foo") |> printfn "%A" 
+      Dva (c3 = "bar", c1 = 5, c2 = 3.4) |> printfn "%A"
+
+Jedan (true, "foo")
+Dva (5, 3.4, "bar")
+\\
+--------------------------------------
+
+Bar kao tip se moze konstruisati pomocu konstruktora 1 ili 2.
+
+Vrijednosti tipa Bar se mogu konstruisati na 2 nacina:
+  pomocu konstruktora Jedan ili Dva.
+
+
+Konstruktor Jedan uzme tuple, bool : string, gdje se prvi 
+zove c1, a drugi se zove c2.
+
+Dva uzima konstruktor koji uzme tuple od int, float i string,
+sa imenaima c1, c2, c3.
+
+
+Imena dakle nisu obavezna, ali mogu biti korisna.
+
+
+Nacin na koji mogu napraviti vrijednost tipa Bar.
+
+Pa kazem 
+  Jedan (true, "foo") |> printfn "%A" 
+
+Jos jednom, konstruktor je funkcija i ja mogu vezivati
+simbole za tu funkciju, ciji ce potpis biti upravo
+potpis tog konstruktora.
+
+//PR 
+--|--
+let f1 = Jedan   
+               \
+                 funkcije
+               /
+let f2 = Dva  
+
+\\
+
+Dakle potpis funkcije je da uzima tuple, bool i string i pravi bar.
+
+Dva uzima int, float, string a pravi bar.
+
+
+
+
+Ako se vratimo: 
+
+      Jedan (true, "foo") |> printfn "%A" 
+      Dva (c3 = "bar", c1 = 5, c2 = 3.4) |> printfn "%A"
+
+Jedan (true, "foo")
+Dva (5, 3.4, "bar")
+
+
+Napravili smo jednu vrijednost tipa bar, tako sto smo pozvali 
+konstruktor Jedan sa tacno i foo.
+
+
+Ovo je nacin na koji se ispisuju Union tipovi koje mi napravimo.
+
+Runtime ispise ime konstruktora kojim smo kreirali objekat tipa bar 
+i argumente koje smo koristili prilikom kreiranja bar.
+
+Runtime zapamti cime konstruisem stvari.
+
+
+Detalj:
+Kada imam imena u tuple-u, mogu promijeniti redoslijed kako pravim.
+Ako izostavim imena, redoslijed mora biti ispostovan.
+
+
+
+
+----------------------------------------------------
+
+Pocinjemo pricati o stvarima iz fp i zasto je to toliko specijalno.
+A pocinje oko sum type-a
+
+//PR
+    type Mozda = Nista | Nesto of int
+
+    let foo a b = 
+      if b = 0 then
+        Nista
+      else 
+         a / b |> Nesto
+
+    foo 5 2 |> printfn "%A" 
+    foo 3 0 |> printfn "%A"
+Nesto 2
+Nista
+\\
+
+Dakle pravimo novi tip, koji se zove mozda.
+
+I vrijednosti tog tipa cu moci napraviti na 2 nacina.
+
+Prvi nacin je da sam kreirao element iz skupa Mozda 
+i zovem ga Nista.
+A svi ostali elementi iz skupa Mozda se prave pomocu
+konstruktora Nesto, koji uzima int.
+
+
+Koliko elemenata u skupu mozda imam?
+- Onoliko koliko je u intu + 1.
+
+Ako ja mogu napraviti int da kazem broj, a intova ima 2^32.
+Za svaki int mozes pronaci element u skupu Mozda, korespondirajuci
+na nacin da je to nesto od 2, nesto od 5, nesto od 12023109.
+
+
+I postoji jedan specijalan element koji ne nastaje pomocu 
+konstruktora i stavili smo mu ime, tj Nista.
+
+
+Skup int je podskup od skupa Mozda.
+Svi elementi u intu imaju svoje blizance u skupu Mozda, jer ih 
+mogu poslat u funkciju Nesto i dobiti Mozda.
+
+I ima taj jedan specijalni element koji se zove Nista.
+
+Razmisljajmo o ovoj specijalnoj funkciji:
+
+  let foo x y = x / y
+
+Napravili smo funkciju koja uzme x, uzme y tipa int, a nazad vraca 
+int koji je rezultat dijeljenja x sa y.
+
+Kada kazem:
+
+  foo 10 5 |> printf "%A"
+
+Nazad dobijemo 2.
+
+Ali ako ovdje stavmio 0, pogledajmo sta ce se dogoditi.
+
+U domenu intova, dijeljenje sa 0 je nedefinirano. Ovo je parcijalna funkcija.
+U domenu realnih brojeva, dijeljenje sa 0 jeste definirano i rezultira sa oo
+
+  foo 10 0 |> printf "%A"
+
+Ovu parcijalnu funkciju treba nekako modelirati, da se tretira ovakva situacija.
+
+C++ to tretira kroz tretmane iznimki.
+C nema konkretnog nacina da to radi, osim specijalnim nacinima koje programer izmisli.
+U C-u svaka funkcija kada bude pozvana sa necim, mora vratiti rezultat!
+
+
+Kada pozovemo ovu funkciju, izvrsi se izraz 10/0 i vrijednost ovog izraza proracuna
+runtime i on prekine izvrsenje mog programa.
+Ispise na ekranu ono sto predstavlja tretman bacanja iznimke.
+
+F# ovakvo tretiranje je naslijedo od .NET runtime-a na kojem se izvrsava i C#, koji 
+je objektno orijentiran.
+
+
+
+Ajmo to napisati na ovaj nacin:
+type Mozda = Nista | Nesto of int
+
+  let foo x y = 
+  if y = 0 then
+    Nista
+  else 
+     x / y |> Nesto
+
+  foo 10 5 |> printf "%A"
+
+
+Damo x koji je 10, i y koji je 5.
+x se dijeli sa y, dobijemo nazad 2, to proslijedimo u funkciju Nesto,
+a to Nesto proizvede Mozda.
+
+Sada je potpis funkcije foo, uzima int, int, a vraca Mozda.
+
+
+Kada pozovemo ovu funkciju bit ce ispisano Nesto od 2
+
+
+Nemamo vise tip int kao povratni tip, imamo Mozda kao rezultat.
+
+
+Mozda reprezentira tip, rezultat proracuna, koji kada uspije
+proizvede int, a kada ne uspije, proizvede Nista.
+
+
+U domenu Mozda, mogu modelirati proracune koji proizvode intove,
+ako je sve ok, a ako ne mogu proizvesti intove, vratit ce mi Nista.
+
+Ova funkcija foo nije vise parijcalna!
+
+Kada je bila potpisa int -> int -> int, za input y, ne moze proizvesti
+rezultat.
+Sada za svaki input uvijek ce proizvesti nesto tipa Mozda.
+
+
+  let foo x y = 
+  if y = 0 then
+    Nista
+  else 
+     x / y |> Nesto
+
+  foo 10 5 |> printf "%A"
+
+Nista
+
+
+
+Nista je vrijednost tipa Mozda.
+Ako funkcija proizvede Nesto, moj program ce nastaviti raditi jednim smjerom.
+Ako dobijemo Nista, program nastavlja drugim smjerom.
+
+
+Dakle u F# ovo je nacin kako od bilo koje funkcije koja je parcijalna 
+napraviti totalnu funkciju.
+Onda vise ne moramo bacati iznimke (koje nisu uvijek pozeljne).
+
+
+
+Jos jednom:
+Tip Mozda je tip koji reprezentira rezultat proracuna koji proizvodi intove 
+koji moze a i ne mora uspjeti.
+
+Ako bi u definiciji ovog tipa promijenili u double.
+
+Identicna ideja kao int.
+
+Sada tip Mozda predstavlja, da rezultat proracuna koji proizvodi double
+ako uspije, a ako ne uspije, proizvodi Nista.
+
+
+Bilo bi dobro kada bih mogao imati jedan tip Mozda koji reprezentira bilo
+kakve proracune koji ako uspiju, proizvode rezultat Nesto tog tipa, a kada 
+nema rezultata proizvode Nista.
+
+Bilo bi dobro, kada bih mogao imati generican tip.
+
+
+F# ima takav tip koji se ne zove Mozda, nego se zove option (u Hasekllu maybe)
+Option ima svoje konstruktore.
+
+Konstruktori su se kod nas zvali Nista i Nesto.
+
+Sada cemo umjesto Nista i Nesto promijeniti i stavit cemo none i some.
+
+
+Sada kompajler kao povratni tip detektuje option<int>
+
+Option kao tip je genericki tip, tj option od neceg.
+
+
+Kada vidimo da nesto tj funkcija vraca option od neceg, to znaci da 
+funkcija moze uspjeti ili ne uspjeti.
+Ako se nazad vrati some<int> tad znaci da je uspjela proizvesti 
+rezultat.
+A ako se vrati none, to je jedan element iz skupa option koji 
+reprezentira nedostatak rezultata.
+
+To je ono sto bi C volio imati, a nema.
+
+
+
+Kako konzumirati rezultat, ako se rezultat krije wrapan u konstruktor?
+- Pa putem pattern matchinga.
+Samo cemo pomocu pattern matchinga moci izvuci konstruisanu vrijednost
+i nastaviti dalje raditi proracun.
+
+
+ZAKLJUCAK:
+Kada se kod ovako ogranizuje, nema nacina da pozovemo funkciju foo,
+a da ne tretiramo happy putanju i unhappy putanju.
+
+
+C programer mora izmisliti metodologiju sta ce s pacijalnim funkcijama.
+I kada izmisli metodologiju, mora prisiliti onog ko koristi njegov kod 
+da se drzi te metodologije i da tretira i happy i unhappy putanju 
+(koju tretira 0.5% programera)
+
+
+Najpedantniji ljudi na svijetu su matematicari i programeri (koji su gora
+varijanta).
+======================================
+
+
