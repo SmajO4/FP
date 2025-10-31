@@ -1,3 +1,5 @@
+Mapa, Lista, Vector su kontejneri ugradjeni u jezik - ne moramo nista importovati
+
 p1.fsx
   currying je proces u kojem se od funkcije koja ima vise argumenata 
   napravi familija funkcija gdje svaka funkcija ima jedan argument i 

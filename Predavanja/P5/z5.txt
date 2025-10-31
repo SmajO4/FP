@@ -1,0 +1,793 @@
+  Najpedantniji ljudi na svijetu su matematicari i programeri (koji su gora
+  varijanta).
+
+  Svaki tip se zna konvertovati u string i prezentirati na ekranu, tj 
+  po defaultu se svi tipovi mogu ispisivati na standardnom izlazu.
+
+  "%A" i "%O" su default formati i mogu isprintati bilo sta.
+
+  tipovi -> sta je svijet (kako je modeliran)
+  kod -> kako je svijet (kako svijet radi)
+
+  Pristup pravljenja tipova u F# se obicno dijeli u 2 koncepta:
+    
+      sum types
+      product types
+
+  Kada budemo uvodili koncept za pravljenje novog tipa, naucit cemo i 
+  novi pattern.
+
+======================================
+|--> type <--|
+
+  U F#, kljucna rijec type se koristi za kreiranje bilo kakvog novog tipa.
+
+  type uvijek uvodi neki simbol koji je tip 
+
+  Pored primitivnih tipova i .NET klasa, F# podrzava
+  i sljedece funkcionalne tipove:
+
+        * Records (Product type)                Ekvivalent u OOP su klase
+
+        * Tuple                                 Postoji biblioteka u C++ pod imenom tuple
+
+        * Descriminated unions (Sum type)       Nema ekvivalenta u OOP
+
+        * List                                  Jednostruko linkana lista
+
+        * Option                                Rjesava problem parcijalnih funkcija.
+
+
+|------------------------------------|
+  Zajednička karakteristike svih navedenih tipova
+
+      Podržavaju poređenje i jednakost            
+
+      Mogu se ispisivati putem printf i sličnih funkcija.
+|------------------------------------^  
+
+  Ovo nije slucaj u C++.
+
+======================================
+
+
+Pogledajmo prvu metodologiju upotrebe kljucne rijeci type.
+
+======================================
+|--> Alias <--|
+
+|------------------------------------|
+  Drugo ime za vec postojeci tip je moguce dati u 
+  formatu:
+
+    type novo_ime = postojeci_tip                Ekvivalent u C (i C++) je typedef (i using)
+
+  Kompajler ne pravi distinkciju izmedju novog i postojeceg tipa.
+|------------------------------------^
+
+//PR
+
+  type foo = int 
+  let z : foo = 5
+
+  let p : int = z
+  z
+
+5
+
+======================================
+
+======================================
+|--> Record <--|
+
+Record je kljucna rijec pomocu koje zelimo praviti korisnicke tipove 
+koji se klasificiraju kao product types.
+
+|------------------------------------|
+  Record je tip argregiran od imenovanih clanova (polja) bilo kojeg F# tipa,
+  koji se kreira u formatu:
+
+    type ime_tipa =                         Kao struct ili class u C++
+      { 
+        clan1 : tip1;
+        clan2 : tip2;             
+        ...
+        clann : tipn;
+      }
+
+  Vrijednosti ovog tipa moguce je kreirati dodijeljivanjem vrijednosti za sve
+  clanove unutar {}
+|------------------------------------^
+
+  Da bi nesto bilo product type, mora se agregirati (praviti) od vec
+  postojecih tipova.
+
+
+  //PR
+
+    type Student = { Ime : string; Prezime : string; Godiste: int }
+
+    let foo = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+
+    foo
+
+  { Ime = "Foo"\n  Prezime = "Bar"\n  Godiste = 2003 }
+  Ime	Foo
+  Prezime	Bar
+  Godiste	2003
+
+  \\
+
+  Redoslijed nije bitan
+
+  Svi clanovi se moraju navesti u kreiranju vr pripadnog tipa.
+
+|------------------------------------|
+  Ukoliko 2 tipa imaju identicna polja prilikom kreiranja vrijednosti
+  bez eksplicitne anotacije, kompajler ce koristiti tip koji je 
+  posljednje kreiran.
+|------------------------------------^
+
+  Ako zelimo kreirati vrijednost prvog tipa, moramo koristiti anotaciju.
+
+  Anotacija se radi na jedan od 2 nacina:
+    
+      anotacijom simbola koji se veze za vr nekog tipa
+
+      eksplicitnim navodjenjem naziva tipa ispred bar jednog polja 
+      datog tipa odvojenih operatorom .
+      { naz_tip.ime_polja, ... }
+
+  //PR
+
+    type Student = { Ime : string; Prezime : string; Godiste: int }
+
+    type Profesor = { Ime : string; Prezime : string; Godiste: int }
+
+    // foo : Profesor
+    let foo = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+
+    // bar : Student
+    let bar : Student = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+
+    // tar : Student 
+    let tar = { Student.Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+
+  \\
+
+  
+  Pogledajmo jednu stvar koja lici na copy konstruktor u C++:
+
+
+  Obratiti paznju: 
+
+  Kada kazemo: 
+
+      type Student = { Ime : string; Prezime : string; Godiste: int }
+      let a = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+      let b = a 
+
+  a i b su vezani za jednu vrijednost! 
+
+  a smo bindiali za kreiranu vrijednost tipa Student, a zatim smo i b 
+  bindali za tu istu vrijednost.
+
+  Drugim rijecima, nismo napravili novu vr za simbol b, tj kopiju vr 
+  za koju je zavezan simbol a.
+
+
+  Da bi to uradili, to mozemo uraditi jedino na ovaj nacin:
+
+      type Student = { Ime : string; Prezime : string; Godiste: int }
+      let a = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+      let b = { Ime = "Foo"; Prezime = "Bar"; Godiste = 2003 }
+
+
+  Ali razmislimo i o ovom detalju:
+
+|------------------------------------|
+  Moguće je kreiranje nove vrijednosti istog tipa uz opcionu promjenu 
+  vrijednosti određenih polja nakon ključne riječi with unutar {}.
+
+  Poljima unutar vrijednosti je moguće pristupiti putem operatora .
+|------------------------------------^
+
+  Posmatrajmo primjer:
+
+  //PR 
+      type Foo = { Ime : String; Godiste : int }
+
+      let foo = { Ime = "Foo"; Godiste = 2005 }
+
+      let bar = { foo with Ime = "Bar" }    // Napravi novu vrijednost koja je 
+                                               kopija i u toj kopiji promijeni
+                                               polje Ime
+  \\
+
+
+
+  Takodjer, mozemo i pristupati simbolima koji su bindiani za neki rekord:
+
+  //PR
+          bar.ime
+      Bar
+
+          bar.Godiste
+      2005
+  \\ 
+
+  
+  Detalj:
+  Ako kazemo:
+
+      bar.Ime = "Bar"
+
+  ne mijenjamo vrijednost polja Ime, vec radimo poredjenje.
+
+======================================
+
+
+======================================
+|--> Record uzorak <--|
+
+  Na mjestu uzorka mozemo koristiti format naveden u nastavku:
+
+|------------------------------------|
+  Format za uzorak je:
+    
+    { p1 = pat1 ; p2 = pat2 ; ...  ; pn = patn }
+
+          Gdje su:
+                  p1, p2, ..., pn - polje
+                  pat1, pat2, ..., patn - uzorak
+
+|------------------------------------^
+
+  Naravno da ce se ovo podudarati na stvarima koji su record typs-i.
+
+  Bit ce potrebno pobrojati odgovarajuca polja od Recorda, na koja zelim 
+  da pattern matcham, koja mene zanimaju.
+
+  Nije obavezno navoditi sve!
+
+  Zanima nas pattern match na neka polja. Taj pattern match moze, ali 
+  i ne mora uspjeti.
+
+
+|------------------------------------|
+  Uzorak ce se podudariti sa vrijednosti, odgovarajuceg Record tipa koje ima 
+  polja: p1, p2, ..., pn, pod uslovom da se SVI uzorci: pat1, pat2, ..., patn
+  podudare sa pojedinacnim clanovima vrijednosti sa kojim se vrsi podudaranje.
+
+  Nije neophodno imenovati sva polja u uzorku ukoliko se ista ne koriste 
+  prilikom podudaranja.
+|------------------------------------^
+
+  Drugim rijecima, mozemo navesti samo one vrijednosti za pattern maching koje 
+  odgovaraju tipu recorda, koje ima polja p1, p2, ..., koje smo koristili u 
+  uzorku.
+
+  Kada uspije pattern match, uhvatimo kompletnu vrijednost odredjenog tipa 
+  recorda, tj ako sam pattern matchao po imenu, imam pristup svim ostalim 
+  poljima.
+
+  //PR 
+      type Adresa = { Ulica : string; Grad : string }
+
+      type Osoba = { Ime : string; Prezime : string; Adresa : Adresa }
+
+      let foo = { Ime = "Foo"; Prezime = "Bar"; 
+                  Adresa = { Ulica = "Tabašnice"; Grad = "Tuzla" }}
+
+      let tar = { Ime = "Tar"; Prezime = "Bar"; 
+                  Adresa = { Ulica = "Vase Miskina"; Grad = "Sarajevo" }}
+  \\ 
+
+  NAPOMENA:
+  Sasvim je ok imati isto ime za polje, kao sto je ime tipa.
+  Dva koncepta su ortogonalna - ne preklapaju se.
+
+
+  // 
+      let jelCool { Ime = ime; Adresa = { Grad = grad } } =
+          if grad = "Tuzla" then 
+            printfn "bravo %s!!" ime
+            true                                    // Ova varijanta je mocnija od ove ispod
+          else                                      // Ova verzija radi i popratne efekte
+            false
+
+      let jelCool1 osoba =                          // ako smo iperativni programer u ovom trenutku
+          if osoba.Adresa.Grad = "Tuzla" then          preferiramo ovu varijantu.
+            true 
+          else 
+            false
+  \\
+
+  Dakle, jelCool je funkcija koja prima Studenta i vraca bool.
+  
+  Ovo ovdje:
+    { Ime = ime; Adresa = { Grad = grad } }
+  je pattern, konkrento record pattern.
+
+              ime je identifier pattern i to je pat1
+
+              {Grad = grad} je record pattern je pat2
+
+              grad je identifier pattern i to je pat3
+
+  Ime se veze za bilo kog studenta kojeg dobijemo u aplikaciji.
+
+  Konkretno, ovaj pattern sluzi da za studenta kojeg ubacimo u 
+  ovu lambdu, da izvadimo njegovo ime i grad.
+
+  U tijelu funkcije imamo uslove, koji ako su zadovoljeni ili ne,
+  vratit ce se true ili false.
+
+  
+  Pogledajmo sada aplikacije ove funkcije:
+
+  //
+        jelCool foo
+      bravo Foo!!
+      True
+
+        jelCool tar
+      False
+
+        jelCool tar = jelCool1 tar     // istu stvar rade obje funkcije, 
+      True                                obje vracaju true
+  \\
+  
+
+======================================
+
+
+
+Razumijevanje koncepta agregacije:
+
+    Tuple je agregacija vise tipova.
+
+    Record je agregacija vise tipova.
+
+    Funkcija je agregacija vise tipova - konkretno 2 tipa.
+
+    Mozemo reci da je funkcija verzija recorda.
+
+    Ako funkcije ne proizvode popratne efekte - funkcija je agregacija 
+    ili tuple od 2 tipa (ako ne proizvodi popratne efekte).
+
+    Bolje receno, funkcija je tuple ili record u kojem vrijednost prvog 
+    znamo a vrijednost drugog mozemo izracunati u bilo kom trenutku.
+
+======================================
+|--> Tuple <--|
+
+  Tuple kao koncept je familija tipova koji su agregirani od drugih tipova.
+
+  Tuple je skup tipova.
+
+|------------------------------------|
+  Tuple je tip, agregiran od neimenovanih clanova (polja) bilo kog F# tipa, 
+  cije ime je u formatu:
+
+    tip1 * tip2 * ... * tipn
+
+    Gdje:
+        tip1, tip2, ...,tipn - predstavljaju tipove od pojedinacnih 
+                               agregiranih clanova
+|------------------------------------^
+
+
+  U Record-u, clanovi imaju ime.
+
+  U Tuple-u, clanovi nemaju ime.
+
+    Ako imena ne postoje, do pojedinih polja, dolazimo pattern matchingom.
+    Pattern koji koristimo je tuple pattern.
+
+  Tuple je efektivno record koji ne imenuje clanove.
+
+
+------------------------------------------
+|--> Kreiranje vrijednosti tipa tuple <--|
+
+
+  Isto kao record samo u (neobaveznim) malim zagradama.
+
+  To radimo pomocu izraza:
+    
+    (v1, v2, v3, ..., vn)         // jedna stvar, druga stvar, ...
+                                  // tipa jedan, tipa dva, ...
+
+
+  Zapravo, zagrade stavljamo zbog cinjenice da , ima nizak prioritet.
+
+  Najcesce trebaju kada se tuple pojavljuje u aplikacijama.
+
+
+
+  Pogledajmo primjer gdje ne treba zagrada:
+
+  //PR
+      let foo = 2, 3.5, "test"             int * float * string 
+      let bar : int * float * string = foo
+
+      type Foo = int * float * string
+
+      let tar : Foo = bar
+      tar
+  \\
+
+======================================
+
+======================================
+|--> tuple uzorak <--|
+
+|------------------------------------|
+  Format za uzorak je:
+
+    (pat1, pat2, ..., patn) 
+
+      Gdje je pat1, pat2, ... patn - uzorak
+
+
+  Podudarit ce se sa vrijednosti odgovarajucet tuple tipa pod uslovom da se
+  podudare svi uzorci: pat1, pat2, ..., patn aplicirani na pojedinacnim 
+  clanovima Tuple-a.
+|------------------------------------^
+
+  Zagrada je ponovo opciona. Ali uglavnom treba.
+
+  Podudaranje zahtijeva da se pojedinacni patterni podudaraju.
+
+  //PR
+      let foo x = 
+        match x with 
+        | (2, _, t) -> t
+        | (_, m, _) -> m
+
+      foo (2, (8, 5), (3, 2)) |> printf "%A"
+  (3, 2)
+  \\
+
+  Kompajler je zakljucio da x mora biti tuple, gdje je prvi u tuple-u int,
+  a drugi i treci mogu biti bilo sta.
+
+  x je tipa tuple 
+    int * 'a * 'a
+
+  Zagrade u aplikaciji su obavezne.
+
+  Ovo sto je u zagradi je tipa 
+    int * (int * int) * (int * int)
+
+  Napomena:
+  t i m u ovom slucaju moraju biti istog tipa.
+
+  Napomena:
+  Zaboravimo na ono pravilo, da prva aplikacija polimorfne funkcije odredjuje 
+  i njen tip.
+  To vazi samo za jedan specijalan slucaj, kada u tijelu funkcije imamo operator +.
+
+--------------------------------------
+======================================
+
+
+======================================
+|--> as uzorak <--|
+
+Ide u kompoziciji sa jos jednim uzorkom.
+
+as uzorak ima format:
+
+  postojeci_uzorak as ime_simbola
+
+|------------------------------------|
+  Format za uzorak je:
+    
+    pat1 as var1
+
+  Gdje:
+    
+    pat1 predstavlja neki uzorak
+    var1 je varijabla
+
+  Ukoliko se pat1 podudari sa vrijednoscu, varijable var1 ce se zavezati
+  za kompletnu vrijednost i moći će se koristiti u izrazu koji figurira 
+  nakon procesa podudaranja.
+
+|------------------------------------^
+
+  ZAPAMTITI:
+
+    pat1 ako se bindia za dijelove vrijednosti odredjenog tipa (npr bindia
+    se za ime i grad studenta), var1 ce se bindiati za kompletnog studenta!
+
+
+  //PR 
+      let foo ((a,b) as c) = (a, b, c)
+
+
+  Bitno za rezonovati je da je foo fnkcija koja prima tuple, konkretno tuple 
+  u formatu (a,b) gdje su a i b bilo kog tipa. 
+  Vidimo da funkcija i vraca tuple.
+
+  Ovo: 
+      ((a,b) as c)
+  je as pattern.
+
+  Unutar as patterna imamo tuple pattern.
+
+  Nazad vracamo tuple tipa od onog sto je a bio, tipa od onog 
+  sto je b, i vracamo c.
+  c je simbol koji je bindian za tuple od a i b.
+
+
+
+  //PR kod aplikacije
+
+      foo (3, "foo") |> printfn "%A"
+  (3, "foo", (3, "foo"))
+
+
+  Gledajmo na funkciju na ovaj nacin:
+
+  let foo ((a : a' ,b : b') as c : (a', b')) = (a, b, c)
+  
+======================================
+
+
+  Sada ulazimo u onaj dio koji se tice sum typs-a.
+
+======================================
+|--> Unije <--|
+|--> Descriminated union <--|
+
+  Konstruktor - FUNKCIJA koja uzme nesto i proizvode nesto.
+
+  To nesto je vrijednost naseg union tipa.
+
+  Konstruktor uzima BILO KOJI tip.
+
+  Unija je tip koji mozemo konstuisati na onoliko nacina, koliko 
+  ima konstruktora.
+
+|------------------------------------|
+  Unije prestavljaju tipove čije vrijednosti mogu biti konstruisane 
+  pomoću različitih varijanti konstruktora od kojih svaki može imati 
+  različit broj i tip parametara u formi tuple-a. 
+
+  Format za kreiranje:
+      type ime_time = 
+        | c1 of p1 : t1 * p2 : t2;
+        | c2 of p3 : t3 * p4 : t4 * p5 : t5;
+        | ...
+        | cn of pm | tm * pm;
+
+        Gdje su:
+
+            c1, c2, ..., cn - imena konstruktora
+            p1, p2, ..., pm - imena parametara za konstruktore (opciono)
+            t1, t2, ..., tm - tipovi parametara za konstruktore 
+                              (obavezno ukoliko u definiciji figurira of)
+|------------------------------------^
+
+  Za razliku od C++, konstruktori se ne moraju nazivati istim imenom.
+
+  Obicno, forma za konstruktore su tuplovi.
+
+
+  Kod obicnog tupla, ne mozemo imenovati polja.
+
+  Kada su upitanju konstruktori, imena su opciona, tipovi su obavezni.
+
+  Imena mogu biti korisna.
+
+
+  Obratiti paznju:
+
+  Mogli smo ovo:
+    | c1 of p1 : t1 * p2 : t2;
+
+  napisati na ovaj nacin:
+    | c1 of t1 * t2
+
+
+
+  BITNO: 
+
+    of je opcion. 
+
+    To znaci da konstruktor ne uzima nista.
+
+    Samim time, to znaci da konstruktor nije funkcija.
+
+  Konstruktor je u tom slucaju simbol koji reprezentira jednu vrijednost tog tipa.
+
+  Ekvivalent za to bi bio enum iz C ili C++.
+  
+
+
+  //PR 
+      type Foo = | Jedan | Dva      // Prvi | je opcion 
+
+      let t : Foo = Jedan           
+
+      Dva = t                       // poredjenje
+    False
+  // 
+
+  Defakto, ovo mozemo rezonovati tako da je:
+
+  Foo tip ili skup od 2 elementa:
+    Jedan i Dva
+
+
+  Takodjer:
+      Ako su konstruktori, onda moramo pozvati funkciju koja ce proizvesti 
+      vrijednost tog tipa i onda broj vrijednosti tog tipa je potencijalno
+      beskonacan u toj varijanti.
+
+
+  //PR 
+        type Bar = 
+            | Jedan of c1 : bool * c2 : string 
+            | Dva of c1: int * c2: float * c3:string
+
+        Jedan (true, "foo") |> printfn "%A" 
+        Dva (c3 = "bar", c1 = 5, c2 = 3.4) |> printfn "%A"
+
+  Jedan (true, "foo")
+  Dva (5, 3.4, "bar")
+  \\
+
+  Vidimo da se vr tipa Bar mogu konstruisati pomocu konstruktora (funkcija) 
+  Jedan ili Dva.
+
+  Oba konstruktora uzimaju tuple:
+      Jedan : (bool, string) -> Bar
+      Dva : (int, float, string) -> Bar
+  
+  Detalj:
+        Kada imam imena u tuple-u, mogu promijeniti redoslijed kako pravim.
+        Ako izostavim imena, redoslijed mora biti ispostovan.
+
+======================================
+
+
+  Sada cemo preci na jedan jako bitan primjer.
+
+======================================
+
+  Napravit cemo novi tip, koji cemo nazvati Mozda.
+
+
+  Vrijednosti tog tipa cu moci napraviti na 2 nacina:
+
+      kreiram element iz skupa Mozda i nazovem ga Nista
+
+      svi ostali elementi iz skupa Mozda se prave pomocu 
+      konstruktora Nesto, koji uzima int.
+
+  Elemenata u skupu imam:
+
+      count(Nesto) + count(Nista)
+
+      tj
+
+      2^32 + 1
+
+  Na osnovu specifikacije, imamo:
+
+      type Mozda = Nista | Nesto of int
+
+
+  Razmisljajmo o ovoj funkciji:
+
+    let foo x y = x / y
+
+
+  Kada kazemo:
+
+    foo 10 5 |> printf "%A"
+
+  nazad dobijemo vr 2 i ispise se na ekran.
+
+
+  Ali, ako kazemo:
+  
+    foo 10 0 |> printf "%A"         // U domenu intova dijeljenje sa 0 je nedefinirano
+                                    // sto nije slucaj u domenu realnih brojeva
+
+  dobit cemo runtime exception.
+
+
+
+  PROBLEM:
+  Imamo parcijalnu funkciju!
+
+  
+  Ali ako imamo ovaj slucaj:
+
+  //PR
+      type Mozda = Nista | Nesto of int
+
+      let foo a b = 
+        if b = 0 then
+          Nista
+        else 
+           a / b |> Nesto
+
+      foo 5 2 |> printfn "%A" 
+      foo 3 0 |> printfn "%A"
+  Nesto 2
+  Nista
+  \\
+  
+
+  Za aplikaciju:
+
+      foo 5 2 |> printfn "%A" 
+
+  5 / 2 = 2, 2 proslijedimo u funkciju Nesto, i ona nam proizvede Mozda.
+
+  Sada je potpis funkcije foo:
+    int -> Mozda
+
+        Mozda reprezentira tip, rezultat proracuna, koji kada uspije
+        proizvede int, a kada ne uspije, proizvede Nista.
+
+        U domenu Mozda, mogu modelirati proracune koji proizvode intove,
+        ako je sve ok, a ako ne mogu proizvesti intove, vratit ce mi Nista.
+
+  Zbog ove cinjenice, funkcija foo vise nije parcijalna!
+
+  Ako funkcija proizvede Nesto, moj program ce nastaviti raditi jednim smjerom.
+  Ako dobijemo Nista, program nastavlja drugim smjerom.
+
+  
+
+  Dakle u F# ovo je nacin kako od bilo koje funkcije koja je parcijalna 
+  napraviti totalnu funkciju.
+
+  Onda vise ne moramo bacati iznimke (koje nisu uvijek pozeljne).
+
+
+
+  Bilo bi dobro kada bih mogao imati jedan tip Mozda koji reprezentira bilo
+  kakve proracune koji ako uspiju, proizvode rezultat Nesto tog tipa, a kada 
+  nema rezultata proizvode Nista.
+
+
+  F# ima takav tip koji se zove option, koji ima svoje konstruktore, koji se zovu
+  none i some.
+
+  Imamo:
+
+        let foo a b =
+          if b = 0 then
+              None
+          else
+              Some (a / b)
+
+      foo 5 2 |> printfn "%A"
+      foo 3 0 |> printfn "%A"
+
+
+  Sada kompajler kao povratni tip detektuje option<int>
+
+  Option kao tip je genericki tip, tj option od neceg.
+
+
+  Kada vidimo da nesto tj funkcija vraca option od neceg, to znaci da 
+  funkcija moze uspjeti ili ne uspjeti.
+
+
+  Da bi konzumirali ovaj wrapan rezultat, ponovo nam je potreban pattern matching.
+
+
+  ZAKLJUCAK:
+    Kada se kod ovako ogranizuje, nema nacina da pozovemo funkciju foo,
+    a da ne tretiramo happy putanju i unhappy putanju.
+
+======================================

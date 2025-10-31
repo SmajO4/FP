@@ -164,7 +164,7 @@ Dva (5, 3.4, "bar")
 \\
 --------------------------------------
 
-Bar kao tip se moze konstruisati pomocu konstruktora 1 ili 2.
+Bar kao tip se moze konstruisati pomocu konstruktora Jedan ili Dva.
 
 Vrijednosti tipa Bar se mogu konstruisati na 2 nacina:
   pomocu konstruktora Jedan ili Dva.
